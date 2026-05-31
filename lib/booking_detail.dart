@@ -1,3 +1,4 @@
+import 'package:final_project_mhs/payment.dart';
 import 'package:flutter/material.dart';
 
 class BookingFormPage extends StatefulWidget {
@@ -32,6 +33,11 @@ class _BookingFormPageState
 
   final TextEditingController notesController =
       TextEditingController();
+
+  double _parsePrice(String priceStr) {
+    final cleaned = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
+    return double.tryParse(cleaned) ?? 25000000;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,15 +326,17 @@ class _BookingFormPageState
 
                 child: ElevatedButton(
                   onPressed: () {
-
-                    Navigator.pop(context);
-
-                    ScaffoldMessenger.of(
-                            context)
-                        .showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Booking Success 🎉",
+                    Navigator.pop(context); // tutup dialog dulu
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PaymentPage(
+                          packageName: widget.packageName,
+                          eventName: eventName.text.isNotEmpty ? eventName.text : '...',
+                          eventDate: dateController.text.isNotEmpty ? dateController.text : '...',
+                          guestCount: int.tryParse('...') ?? 500,
+                          packagePrice: _parsePrice(widget.price), // parse "Rp. 25.000.000" → 25000000
+                          dpAmount: _parsePrice(widget.price) * 0.3,
                         ),
                       ),
                     );
