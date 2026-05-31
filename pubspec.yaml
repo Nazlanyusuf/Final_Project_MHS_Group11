@@ -31,6 +31,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  final_project_mhs:
+    git:
+      url: https://github.com/Nazlanyusuf/Final_Project_MHS_Group11
+      ref: main
 
 dev_dependencies:
 
