@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class BookingFormPage extends StatefulWidget {
-
   final String packageName;
   final String price;
 
@@ -36,318 +35,340 @@ class _BookingFormPageState
 
   @override
   Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding:
+          const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 20,
+      ),
 
-    return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.6),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight:
+              MediaQuery.of(context).size.height *
+                  0.85,
+        ),
 
-      body: Stack(
-        children: [
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(28),
+        ),
 
-          /// BACKGROUND IMAGE
-          SizedBox(
-            height: 260,
-            width: double.infinity,
-            child: Image.network(
-              "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop",
-              fit: BoxFit.cover,
-            ),
-          ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
 
-          /// FORM CARD
-          Positioned.fill(
-            top: 70,
-            child: Container(
-              margin:
-                  const EdgeInsets.symmetric(
-                horizontal: 12,
+              /// CLOSE BUTTON
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                  ),
+                ),
               ),
-              padding: const EdgeInsets.all(16),
 
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(24),
+              /// STEP INDICATOR
+              Row(
+                children: [
+
+                  _stepItem(
+                    number: "1",
+                    title: "Package",
+                    active: true,
+                  ),
+
+                  Expanded(
+                    child: Divider(
+                      color: Colors.blue.shade200,
+                      thickness: 2,
+                    ),
+                  ),
+
+                  _stepItem(
+                    number: "2",
+                    title: "Details",
+                    active: true,
+                  ),
+
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.shade300,
+                      thickness: 2,
+                    ),
+                  ),
+
+                  _stepItem(
+                    number: "3",
+                    title: "Payment",
+                  ),
+
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.shade300,
+                      thickness: 2,
+                    ),
+                  ),
+
+                  _stepItem(
+                    number: "4",
+                    title: "Confirm",
+                  ),
+                ],
               ),
 
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+              const SizedBox(height: 24),
+
+              const Text(
+                "Choosed Package",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Container(
+                padding:
+                    const EdgeInsets.all(14),
+
+                decoration: BoxDecoration(
+                  color:
+                      const Color(0xFFD8DCF7),
+                  borderRadius:
+                      BorderRadius.circular(
+                    14,
+                  ),
+                ),
+
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment
+                          .spaceBetween,
+
                   children: [
 
-                    /// STEP INDICATOR
-                    Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                      children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
 
-                        _stepItem(
-                          number: "1",
-                          title: "Package",
-                          active: true,
-                        ),
-
-                        Expanded(
-                          child: Divider(
-                            color: Colors.blue.shade200,
-                            thickness: 2,
-                          ),
-                        ),
-
-                        _stepItem(
-                          number: "2",
-                          title: "Details",
-                          active: true,
-                        ),
-
-                        Expanded(
-                          child: Divider(
-                            color: Colors.grey.shade300,
-                            thickness: 2,
-                          ),
-                        ),
-
-                        _stepItem(
-                          number: "3",
-                          title: "Payment",
-                        ),
-
-                        Expanded(
-                          child: Divider(
-                            color: Colors.grey.shade300,
-                            thickness: 2,
-                          ),
-                        ),
-
-                        _stepItem(
-                          number: "4",
-                          title: "Confirm",
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      "Choosed Package",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Container(
-                      padding:
-                          const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color:
-                            const Color(0xFFD8DCF7),
-                        borderRadius:
-                            BorderRadius.circular(
-                          14,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment
-                                .spaceBetween,
                         children: [
 
-                          Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-                            children: [
-
-                              Text(
-                                widget.packageName,
-                                style:
-                                    const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight:
-                                      FontWeight.bold,
-                                ),
-                              ),
-
-                              const Text(
-                                "Dekorasi + MC + Foto + Katering",
-                                style: TextStyle(
-                                  color:
-                                      Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-
                           Text(
-                            widget.price,
-                            style: const TextStyle(
+                            widget.packageName,
+                            style:
+                                const TextStyle(
                               fontSize: 24,
                               fontWeight:
-                                  FontWeight.bold,
+                                  FontWeight
+                                      .bold,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
 
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      "Event Details",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    _inputField(
-                      "Event name",
-                      "Wedding of bowo and joko",
-                      eventName,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-
-                        Expanded(
-                          child: _inputField(
-                            "Date",
-                            "12 June 2026",
-                            dateController,
+                          const SizedBox(
+                            height: 4,
                           ),
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        Expanded(
-                          child: _inputField(
-                            "Estimate guest",
-                            "300 peoples",
-                            guestController,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    _inputField(
-                      "Event location",
-                      "Ex: Binus Alam sutera...",
-                      locationController,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    _inputField(
-                      "Additional notes",
-                      "Ex: Special request to EO...",
-                      notesController,
-                      maxLines: 3,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            const Color(0xFFD8DCF7),
-                        borderRadius:
-                            BorderRadius.circular(
-                          10,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment
-                                .spaceBetween,
-                        children: [
 
                           const Text(
-                            "DP (30%)",
+                            "Dekorasi + MC + Foto + Katering",
                             style: TextStyle(
-                              fontWeight:
-                                  FontWeight.w600,
-                            ),
-                          ),
-
-                          Text(
-                            "Rp 7.500.000",
-                            style: TextStyle(
-                              color: Colors.blue
-                                  .shade700,
-                              fontWeight:
-                                  FontWeight.bold,
+                              color:
+                                  Colors.black54,
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 34),
-
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-
-                          ScaffoldMessenger.of(
-                                  context)
-                              .showSnackBar(
-                            const SnackBar(
-                              behavior:
-                                  SnackBarBehavior
-                                      .floating,
-                              content: Text(
-                                "Booking Success 🎉",
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 60,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                const Color(
-                              0xFF69B7F4,
-                            ),
-                            borderRadius:
-                                BorderRadius
-                                    .circular(16),
-                          ),
-                          child: const Text(
-                            "Book",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight:
-                                  FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
+                    Text(
+                      widget.price,
+                      style:
+                          const TextStyle(
+                        fontSize: 20,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 24),
+
+              const Text(
+                "Event Details",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              _inputField(
+                "Event Name",
+                "Wedding of Bowo & Joko",
+                eventName,
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+
+                  Expanded(
+                    child: _inputField(
+                      "Date",
+                      "12 June 2026",
+                      dateController,
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: _inputField(
+                      "Guests",
+                      "300 People",
+                      guestController,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              _inputField(
+                "Location",
+                "Ex: Binus Alam Sutera",
+                locationController,
+              ),
+
+              const SizedBox(height: 12),
+
+              _inputField(
+                "Additional Notes",
+                "Special request...",
+                notesController,
+                maxLines: 3,
+              ),
+
+              const SizedBox(height: 20),
+
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+
+                decoration: BoxDecoration(
+                  color:
+                      const Color(0xFFD8DCF7),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    10,
+                  ),
+                ),
+
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment
+                          .spaceBetween,
+
+                  children: [
+
+                    const Text(
+                      "DP (30%)",
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.w600,
+                      ),
+                    ),
+
+                    Text(
+                      "Rp 7.500.000",
+                      style: TextStyle(
+                        color:
+                            Colors.blue.shade700,
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+
+                child: ElevatedButton(
+                  onPressed: () {
+
+                    Navigator.pop(context);
+
+                    ScaffoldMessenger.of(
+                            context)
+                        .showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Booking Success 🎉",
+                        ),
+                      ),
+                    );
+                  },
+
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color(
+                      0xFF69B7F4,
+                    ),
+
+                    padding:
+                        const EdgeInsets.symmetric(
+                      vertical: 16,
+                    ),
+
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+                    ),
+                  ),
+
+                  child: const Text(
+                    "Book",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -357,24 +378,27 @@ class _BookingFormPageState
     required String title,
     bool active = false,
   }) {
-
     return Column(
       children: [
 
         Container(
-          width: 34,
-          height: 34,
+          width: 36,
+          height: 36,
+
           decoration: BoxDecoration(
+            shape: BoxShape.circle,
+
             color: active
                 ? Colors.blue
                 : Colors.white,
+
             border: Border.all(
               color: active
                   ? Colors.blue
                   : Colors.grey,
             ),
-            shape: BoxShape.circle,
           ),
+
           child: Center(
             child: Text(
               number,
@@ -407,16 +431,17 @@ class _BookingFormPageState
     TextEditingController controller, {
     int maxLines = 1,
   }) {
-
     return Column(
       crossAxisAlignment:
           CrossAxisAlignment.start,
+
       children: [
 
         Text(
           title,
           style: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight:
+                FontWeight.w600,
           ),
         ),
 
@@ -430,19 +455,23 @@ class _BookingFormPageState
             hintText: hint,
 
             filled: true,
+
             fillColor:
                 const Color(0xFFBEE0FF),
+
+            border: OutlineInputBorder(
+              borderRadius:
+                  BorderRadius.circular(
+                10,
+              ),
+              borderSide:
+                  BorderSide.none,
+            ),
 
             contentPadding:
                 const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 14,
-            ),
-
-            border: OutlineInputBorder(
-              borderRadius:
-                  BorderRadius.circular(10),
-              borderSide: BorderSide.none,
             ),
           ),
         ),

@@ -494,14 +494,12 @@ class BookingDetailPage extends StatelessWidget {
 
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  BookingFormPage(
-                                packageName: title,
-                                price: price,
-                              ),
+                          showDialog(
+                            context: context,
+                            barrierColor: Colors.black54,
+                            builder: (_) => BookingFormPage(
+                              packageName: title,
+                              price: price,
                             ),
                           );
                         },
