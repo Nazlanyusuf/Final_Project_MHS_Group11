@@ -146,9 +146,9 @@ class _PaymentPageState extends State<PaymentPage> {
           height: 28,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? const Color(0xFF5B8DEF) : Colors.transparent,
+            color: isActive ? const Color(0xFF69B7F4) : Colors.transparent,
             border: Border.all(
-              color: isActive ? const Color(0xFF5B8DEF) : Colors.grey.shade400,
+              color: isActive ? const Color(0xFF69B7F4) : Colors.grey.shade400,
               width: 1.5,
             ),
           ),
@@ -168,7 +168,7 @@ class _PaymentPageState extends State<PaymentPage> {
           label,
           style: TextStyle(
             fontSize: 10,
-            color: isActive ? const Color(0xFF5B8DEF) : Colors.grey.shade500,
+            color: isActive ? const Color(0xFF69B7F4) : Colors.grey.shade500,
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
@@ -181,7 +181,7 @@ class _PaymentPageState extends State<PaymentPage> {
       child: Container(
         height: 1.5,
         margin: const EdgeInsets.only(bottom: 16),
-        color: filled ? const Color(0xFF5B8DEF) : Colors.grey.shade300,
+        color: filled ? const Color(0xFF69B7F4) : Colors.grey.shade300,
       ),
     );
   }
@@ -238,13 +238,13 @@ class _PaymentPageState extends State<PaymentPage> {
                 Row(
                   children: [
                     const Icon(Icons.calendar_today,
-                        size: 12, color: Color(0xFF5B8DEF)),
+                        size: 12, color: Color(0xFF69B7F4)),
                     const SizedBox(width: 4),
                     Text(
                       widget.eventDate,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF5B8DEF),
+                        color: Color(0xFF69B7F4),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -284,7 +284,7 @@ class _PaymentPageState extends State<PaymentPage> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF5B8DEF)
+                ? const Color(0xFF69B7F4)
                 : Colors.transparent,
             width: 1.5,
           ),
@@ -327,7 +327,7 @@ class _PaymentPageState extends State<PaymentPage> {
               value: id,
               groupValue: _selectedPayment,
               onChanged: (v) => setState(() => _selectedPayment = v!),
-              activeColor: const Color(0xFF5B8DEF),
+              activeColor: const Color(0xFF69B7F4),
             ),
           ],
         ),
@@ -484,7 +484,7 @@ class _PaymentPageState extends State<PaymentPage> {
               child: ElevatedButton(
                 onPressed: _onPayNow,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5B8DEF),
+                  backgroundColor: const Color(0xFF69B7F4),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
