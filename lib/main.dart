@@ -18,7 +18,7 @@ class VenueKitaAja extends StatelessWidget {
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
       ),
-      home: const DashboardPage(),
+      home: const MainNavigation(),
     );
   }
 }
