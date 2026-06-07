@@ -13,21 +13,18 @@ class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   // ─── Daftar halaman ──────────────────────────────────────────────
-  // Tambah halaman baru di sini, tidak perlu sentuh file lain
   final List<Widget> _pages = const [
     DashboardPage(),                             // index 0 → Home
     _PlaceholderPage(label: 'Wishlist'),         // index 1
     _PlaceholderPage(label: 'Activity'),         // index 2
-    _PlaceholderPage(label: 'Explore'),          // index 3
-    _PlaceholderPage(label: 'Profile'),          // index 4
+    _PlaceholderPage(label: 'Profile'),          // index 3
   ];
 
   static const _navItems = [
-    _NavItem(icon: Icons.home_rounded,     activeIcon: Icons.home_rounded,      label: 'Home'),
-    _NavItem(icon: Icons.favorite_border,  activeIcon: Icons.favorite,          label: 'Wishlist'),
+    _NavItem(icon: Icons.home_rounded,     activeIcon: Icons.home_rounded,       label: 'Home'),
+    _NavItem(icon: Icons.favorite_border,  activeIcon: Icons.favorite,           label: 'Wishlist'),
     _NavItem(icon: Icons.access_time,      activeIcon: Icons.access_time_filled, label: 'Activity'),
-    _NavItem(icon: Icons.explore_outlined, activeIcon: Icons.explore,           label: 'Explore'),
-    _NavItem(icon: Icons.person_outline,   activeIcon: Icons.person,            label: 'Profile'),
+    _NavItem(icon: Icons.person_outline,   activeIcon: Icons.person,             label: 'Profile'),
   ];
 
   @override

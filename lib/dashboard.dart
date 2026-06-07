@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'booking.dart';
 
-/// ─── PENTING ─────────────────────────────────────────────────────
-/// File ini adalah isi halaman Home (index 0) saja.
-/// JANGAN ada Scaffold dengan bottomNavigationBar di sini,
-/// karena footer sudah dihandle oleh MainNavigation.
-/// ─────────────────────────────────────────────────────────────────
-
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
@@ -16,35 +10,35 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final List<Map<String, dynamic>> categories = [
-    {"title": "Wedding",    "icon": Icons.favorite,   "color": Colors.pink},
+    {"title": "Wedding",    "icon": Icons.favorite,    "color": Colors.pink},
     {"title": "Concert",    "icon": Icons.music_note,  "color": Colors.purple},
     {"title": "Birthday",   "icon": Icons.cake,        "color": Colors.orange},
     {"title": "Seminar",    "icon": Icons.groups,      "color": Colors.blue},
     {"title": "Photoshoot", "icon": Icons.camera_alt,  "color": Colors.teal},
+    {"title": "All\nProducts", "icon": Icons.apps,     "color": Colors.grey},
   ];
 
   final List<Map<String, dynamic>> venues = [
     {
-      "title": "Elegant Wedding Organizer",
+      "title": "Le Blanc Wedding Organizer",
       "rating": "4.9",
       "review": "97",
       "location": "BSD",
-      "price": "Rp 25.000.000",
+      "price": "Rp 8.000.000",
       "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1000&auto=format&fit=crop",
     },
     {
-      "title": "Amrijuyo Hotel",
+      "title": "Party Planner Birthday Organizer",
       "rating": "4.4",
       "review": "125",
-      "location": "JAWA TENGAH",
-      "price": "Rp 15.000.000",
-      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
+      "location": "JabaDeTaBek",
+      "price": "Rp 5.000.000",
+      "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=1000&auto=format&fit=crop",
     },
   ];
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Tidak ada bottomNavigationBar di Scaffold ini
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -111,40 +105,53 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Text(
                                       venue["title"],
                                       style: const TextStyle(
-                                          fontSize: 15, fontWeight: FontWeight.w700),
+                                          fontSize: 14, fontWeight: FontWeight.w700),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 6),
                                     Row(
                                       children: [
-                                        const Icon(Icons.star, color: Colors.amber, size: 18),
-                                        const SizedBox(width: 4),
-                                        Text(venue["rating"]),
-                                        const SizedBox(width: 10),
-                                        const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.grey),
-                                        const SizedBox(width: 4),
-                                        Text("${venue["review"]} Review"),
+                                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                                        const SizedBox(width: 3),
+                                        Text(venue["rating"],
+                                            style: const TextStyle(fontSize: 12)),
+                                        const SizedBox(width: 8),
+                                        const Icon(Icons.chat_bubble_outline,
+                                            size: 14, color: Colors.grey),
+                                        const SizedBox(width: 3),
+                                        Text("${venue["review"]} Review",
+                                            style: const TextStyle(fontSize: 12)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on,
+                                            size: 14, color: Colors.black54),
+                                        const SizedBox(width: 3),
+                                        Expanded(
+                                          child: Text(venue["location"],
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12),
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.location_on, size: 17, color: Colors.black54),
-                                        const SizedBox(width: 4),
-                                        Text(venue["location"],
-                                            style: const TextStyle(fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
                                     Align(
                                       alignment: Alignment.bottomRight,
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           const Text("Start from",
-                                              style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                              style: TextStyle(
+                                                  fontSize: 10, color: Colors.grey)),
                                           Text(venue["price"],
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.bold, fontSize: 14)),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13)),
                                         ],
                                       ),
                                     ),
@@ -169,7 +176,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
       decoration: const BoxDecoration(
         color: Color(0xFF6DB6E3),
         borderRadius: BorderRadius.only(
@@ -178,7 +185,9 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -188,7 +197,18 @@ class _DashboardPageState extends State<DashboardPage> {
               _circleButton(Icons.chat_bubble_outline),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          // Subtitle
+          const Text(
+            'Book venues and event organizers easily and\nsecurely in one platform',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Search bar
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -203,70 +223,67 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              double itemWidth = (constraints.maxWidth - 56) / 5;
-              return SizedBox(
-                height: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(categories.length, (index) {
-                    final item = categories[index];
-                    return GestureDetector(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            behavior: SnackBarBehavior.floating,
-                            content: Text("${item["title"]} clicked 🎉"),
-                          ),
-                        );
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        width: itemWidth,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: (item["color"] as Color).withOpacity(0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(item["icon"], color: item["color"], size: 22),
-                            ),
-                            const SizedBox(height: 8),
-                            Flexible(
-                              child: Text(
-                                item["title"],
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontSize: 11, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ],
-                        ),
+          const SizedBox(height: 18),
+          // Categories (horizontal scroll)
+          SizedBox(
+            height: 95,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final item = categories[index];
+                final isLast = index == categories.length - 1;
+                return GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text("${item["title"].toString().replaceAll('\n', ' ')} clicked"),
                       ),
                     );
-                  }),
-                ),
-              );
-            },
+                  },
+                  child: Container(
+                    width: 64,
+                    margin: EdgeInsets.only(right: isLast ? 0 : 10),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: (item["color"] as Color).withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(item["icon"] as IconData,
+                              color: item["color"] as Color, size: 20),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          item["title"] as String,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 9.5, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

@@ -12,200 +12,223 @@ class BookingFormPage extends StatefulWidget {
   });
 
   @override
-  State<BookingFormPage> createState() =>
-      _BookingFormPageState();
+  State<BookingFormPage> createState() => _BookingFormPageState();
 }
 
-class _BookingFormPageState
-    extends State<BookingFormPage> {
-
-  final TextEditingController eventName =
-      TextEditingController();
-
-  final TextEditingController dateController =
-      TextEditingController();
-
-  final TextEditingController guestController =
-      TextEditingController();
-
-  final TextEditingController locationController =
-      TextEditingController();
-
-  final TextEditingController notesController =
-      TextEditingController();
+class _BookingFormPageState extends State<BookingFormPage> {
+  final TextEditingController eventName     = TextEditingController();
+  final TextEditingController dateController    = TextEditingController();
+  final TextEditingController guestController   = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController notesController   = TextEditingController();
 
   double _parsePrice(String priceStr) {
     final cleaned = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
     return double.tryParse(cleaned) ?? 25000000;
   }
 
+  String get _dpFormatted {
+    final dp = _parsePrice(widget.price) * 0.3;
+    final formatted = dp.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+    return 'Rp $formatted';
+  }
+
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 30)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF69B7F4),
+            onPrimary: Colors.white,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      dateController.text =
+          '${picked.day} ${_monthName(picked.month)} ${picked.year}';
+    }
+  }
+
+  String _monthName(int m) {
+    const months = [
+      '', 'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[m];
+  }
+
+  void _showRequiredAlert(String fieldName) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+            SizedBox(width: 8),
+            Text('Field Wajib Diisi', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          '$fieldName harus diisi sebelum melanjutkan.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF69B7F4),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              elevation: 0,
+            ),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submit() {
+    if (eventName.text.trim().isEmpty) {
+      _showRequiredAlert('Event Name');
+      return;
+    }
+    if (dateController.text.trim().isEmpty) {
+      _showRequiredAlert('Date');
+      return;
+    }
+    if (guestController.text.trim().isEmpty) {
+      _showRequiredAlert('Jumlah Tamu (Guests)');
+      return;
+    }
+    if (locationController.text.trim().isEmpty) {
+      _showRequiredAlert('Location');
+      return;
+    }
+
+    final guestCount = int.tryParse(
+          guestController.text.trim().replaceAll(RegExp(r'[^0-9]'), ''),
+        ) ??
+        1;
+
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentPage(
+          packageName: widget.packageName,
+          eventName: eventName.text.trim(),
+          eventDate: dateController.text.trim(),
+          guestCount: guestCount,
+          packagePrice: _parsePrice(widget.price),
+          dpAmount: _parsePrice(widget.price) * 0.3,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    eventName.dispose();
+    dateController.dispose();
+    guestController.dispose();
+    locationController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding:
-          const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 20,
-      ),
-
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
       child: Container(
         constraints: BoxConstraints(
-          maxHeight:
-              MediaQuery.of(context).size.height *
-                  0.85,
+          maxHeight: MediaQuery.of(context).size.height * 0.88,
         ),
-
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(28),
         ),
-
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(18),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              /// CLOSE BUTTON
+              // Close button
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.close,
-                  ),
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
                 ),
               ),
 
-              /// STEP INDICATOR
+              // Step indicator
               Row(
                 children: [
-
-                  _stepItem(
-                    number: "1",
-                    title: "Package",
-                    active: true,
-                  ),
-
-                  Expanded(
-                    child: Divider(
-                      color: Colors.blue.shade200,
-                      thickness: 2,
-                    ),
-                  ),
-
-                  _stepItem(
-                    number: "2",
-                    title: "Details",
-                    active: true,
-                  ),
-
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 2,
-                    ),
-                  ),
-
-                  _stepItem(
-                    number: "3",
-                    title: "Payment",
-                  ),
-
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 2,
-                    ),
-                  ),
-
-                  _stepItem(
-                    number: "4",
-                    title: "Confirm",
-                  ),
+                  _stepItem(number: "1", title: "Package", active: true),
+                  Expanded(child: Divider(color: Colors.blue.shade200, thickness: 2)),
+                  _stepItem(number: "2", title: "Details", active: true),
+                  Expanded(child: Divider(color: Colors.grey.shade300, thickness: 2)),
+                  _stepItem(number: "3", title: "Payment"),
+                  Expanded(child: Divider(color: Colors.grey.shade300, thickness: 2)),
+                  _stepItem(number: "4", title: "Confirm"),
                 ],
               ),
 
               const SizedBox(height: 24),
 
               const Text(
-                "Choosed Package",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
+                "Chosen Package",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 12),
 
               Container(
-                padding:
-                    const EdgeInsets.all(14),
-
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFD8DCF7),
-                  borderRadius:
-                      BorderRadius.circular(
-                    14,
-                  ),
+                  color: const Color(0xFFD8DCF7),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment
-                          .spaceBetween,
-
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Text(
                             widget.packageName,
-                            style:
-                                const TextStyle(
-                              fontSize: 24,
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
-                            ),
+                            style: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-
-                          const SizedBox(
-                            height: 4,
-                          ),
-
+                          const SizedBox(height: 4),
                           const Text(
                             "Dekorasi + MC + Foto + Katering",
-                            style: TextStyle(
-                              color:
-                                  Colors.black54,
-                            ),
+                            style: TextStyle(color: Colors.black54),
                           ),
                         ],
                       ),
                     ),
-
                     Text(
                       widget.price,
-                      style:
-                          const TextStyle(
-                        fontSize: 20,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -215,18 +238,14 @@ class _BookingFormPageState
 
               const Text(
                 "Event Details",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 12),
 
               _inputField(
-                "Event Name",
-                "Wedding of Bowo & Joko",
+                "Event Name *",
+                "e.g. Wedding of Bowo & Joko",
                 eventName,
               ),
 
@@ -234,22 +253,16 @@ class _BookingFormPageState
 
               Row(
                 children: [
-
                   Expanded(
-                    child: _inputField(
-                      "Date",
-                      "12 June 2026",
-                      dateController,
-                    ),
+                    child: _dateField(),
                   ),
-
                   const SizedBox(width: 10),
-
                   Expanded(
                     child: _inputField(
-                      "Guests",
-                      "300 People",
+                      "Guests *",
+                      "e.g. 300",
                       guestController,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
@@ -258,8 +271,8 @@ class _BookingFormPageState
               const SizedBox(height: 12),
 
               _inputField(
-                "Location",
-                "Ex: Binus Alam Sutera",
+                "Location *",
+                "e.g. Binus Alam Sutera",
                 locationController,
               ),
 
@@ -267,52 +280,32 @@ class _BookingFormPageState
 
               _inputField(
                 "Additional Notes",
-                "Special request...",
+                "Special request... (opsional)",
                 notesController,
                 maxLines: 3,
               ),
 
               const SizedBox(height: 20),
 
+              // DP row
               Container(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFD8DCF7),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    10,
-                  ),
+                  color: const Color(0xFFD8DCF7),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment
-                          .spaceBetween,
-
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     const Text(
                       "DP (30%)",
-                      style: TextStyle(
-                        fontWeight:
-                            FontWeight.w600,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
-
                     Text(
-                      "Rp 7.500.000",
+                      _dpFormatted,
                       style: TextStyle(
-                        color:
-                            Colors.blue.shade700,
-                        fontWeight:
-                            FontWeight.bold,
+                        color: Colors.blue.shade700,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -323,53 +316,22 @@ class _BookingFormPageState
 
               SizedBox(
                 width: double.infinity,
-
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // tutup dialog dulu
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PaymentPage(
-                          packageName: widget.packageName,
-                          eventName: eventName.text.isNotEmpty ? eventName.text : '...',
-                          eventDate: dateController.text.isNotEmpty ? dateController.text : '...',
-                          guestCount: int.tryParse('...') ?? 500,
-                          packagePrice: _parsePrice(widget.price), // parse "Rp. 25.000.000" → 25000000
-                          dpAmount: _parsePrice(widget.price) * 0.3,
-                        ),
-                      ),
-                    );
-                  },
-
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(
-                      0xFF69B7F4,
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF69B7F4),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-
-                    padding:
-                        const EdgeInsets.symmetric(
-                      vertical: 16,
-                    ),
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
+                    elevation: 0,
                   ),
-
                   child: const Text(
                     "Book",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -381,6 +343,40 @@ class _BookingFormPageState
     );
   }
 
+  Widget _dateField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Date *",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: _selectDate,
+          child: AbsorbPointer(
+            child: TextField(
+              controller: dateController,
+              decoration: InputDecoration(
+                hintText: "Pick a date",
+                suffixIcon: const Icon(Icons.calendar_today, size: 18,
+                    color: Colors.black45),
+                filled: true,
+                fillColor: const Color(0xFFBEE0FF),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 14),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _stepItem({
     required String number,
     required String title,
@@ -388,47 +384,28 @@ class _BookingFormPageState
   }) {
     return Column(
       children: [
-
         Container(
           width: 36,
           height: 36,
-
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-
-            color: active
-                ? Colors.blue
-                : Colors.white,
-
+            color: active ? Colors.blue : Colors.white,
             border: Border.all(
-              color: active
-                  ? Colors.blue
-                  : Colors.grey,
+              color: active ? Colors.blue : Colors.grey,
             ),
           ),
-
           child: Center(
             child: Text(
               number,
               style: TextStyle(
-                color: active
-                    ? Colors.white
-                    : Colors.black,
-                fontWeight:
-                    FontWeight.bold,
+                color: active ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
-
         const SizedBox(height: 4),
-
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-          ),
-        ),
+        Text(title, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
@@ -438,49 +415,27 @@ class _BookingFormPageState
     String hint,
     TextEditingController controller, {
     int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight:
-                FontWeight.w600,
-          ),
-        ),
-
+        Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
-
         TextField(
           controller: controller,
           maxLines: maxLines,
-
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
-
             filled: true,
-
-            fillColor:
-                const Color(0xFFBEE0FF),
-
+            fillColor: const Color(0xFFBEE0FF),
             border: OutlineInputBorder(
-              borderRadius:
-                  BorderRadius.circular(
-                10,
-              ),
-              borderSide:
-                  BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
             ),
-
             contentPadding:
-                const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
-            ),
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           ),
         ),
       ],

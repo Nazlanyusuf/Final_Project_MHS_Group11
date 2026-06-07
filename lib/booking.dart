@@ -90,7 +90,7 @@ class BookingDetailPage extends StatelessWidget {
                     children: [
 
                       const Text(
-                        "Elegant Wedding\nOrganizer",
+                        "Le Blanc Wedding\nOrganizer",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 30,
@@ -144,7 +144,7 @@ class BookingDetailPage extends StatelessWidget {
                                 ),
                                 SizedBox(width: 4),
                                 Text(
-                                  "4.8",
+                                  "4.9",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -197,7 +197,7 @@ class BookingDetailPage extends StatelessWidget {
                           text: const TextSpan(
                             children: [
                               TextSpan(
-                                text: "4.8",
+                                text: "4.9",
                                 style: TextStyle(
                                   color: Colors.blue,
                                   fontWeight: FontWeight.bold,
@@ -220,7 +220,7 @@ class BookingDetailPage extends StatelessWidget {
                     const SizedBox(height: 6),
 
                     const Text(
-                      "Based on 120 reviews",
+                      "Based on 97 reviews",
                       style: TextStyle(
                         color: Colors.black54,
                       ),
