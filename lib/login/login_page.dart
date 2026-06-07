@@ -1,241 +1,209 @@
-import 'package:final_project_mhs/serivces/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'login_form_page.dart';
 import 'register_page.dart';
+import '../main_navigation.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _rememberMe = true;
-  bool _isLoading = false;
-  bool _obscurePassword = true;
-
-  static const _bgColor = Color(0xFF6DB6E3);
-
-  Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      _showSnack('Email dan password wajib diisi');
-      return;
-    }
-    setState(() => _isLoading = true);
-    try {
-      final result = await AuthService.login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-      if (!mounted) return;
-      if (result['success'] == true) {
-        _showSnack('Login berhasil!');
-      } else {
-        _showSnack(result['message'] ?? 'Login gagal');
-      }
-    } catch (e) {
-      _showSnack('Terjadi kesalahan: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  void _showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(behavior: SnackBarBehavior.floating, content: Text(msg)),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  static const _blue = Color(0xFF6DB6E3);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgColor,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-
-                // ── Logo / App name ──────────────────────────────
-                const Text(
-                  'VenueKitaAja',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // Email
-                _inputField(
-                  controller: _emailController,
-                  hint: 'Username/Email',
-                  keyboardType: TextInputType.emailAddress,
-                ),
-
-                const SizedBox(height: 12),
-
-                // ── Password ─────────────────────────────────────
-                _inputField(
-                  controller: _passwordController,
-                  hint: 'Password',
-                  obscure: _obscurePassword,
-                  suffix: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      size: 20,
-                      color: Colors.black45,
+      body: Column(
+        children: [
+          Expanded(
+            flex: 55,
+            child: Container(
+              color: _blue,
+              child: SafeArea(
+                bottom: false,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 24),
+                        // Icon illustration
+                        Container(
+                          width: 110,
+                          height: 110,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.location_city,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        const Text(
+                          'VenueKitaAja',
+                          style: TextStyle(
+                            fontSize: 34,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Temukan venue terbaik\nuntuk momen spesialmu',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
+                            height: 1.55,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        // Feature chips
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _chip(Icons.favorite_outline, 'Wedding'),
+                            const SizedBox(width: 8),
+                            _chip(Icons.music_note_outlined, 'Concert'),
+                            const SizedBox(width: 8),
+                            _chip(Icons.cake_outlined, 'Birthday'),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-
-                const SizedBox(height: 10),
-
-                // Remember Me
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: Checkbox(
-                        value: _rememberMe,
-                        onChanged: (v) => setState(() => _rememberMe = v ?? false),
-                        activeColor: Colors.black87,
+              ),
+            ),
+          ),
+          // Bottom white card
+          Expanded(
+            flex: 45,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(36),
+                  topRight: Radius.circular(36),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(28, 36, 28, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Mulai Perjalananmu',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Cari & booking venue impian dengan mudah',
+                    style: TextStyle(fontSize: 13, color: Colors.black45),
+                  ),
+                  const SizedBox(height: 28),
+                  // Masuk button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginFormPage()),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _blue,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Masuk',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Daftar button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterPage()),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _blue,
+                        side: const BorderSide(color: _blue, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Daftar',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MainNavigation()),
+                      ),
+                      child: const Text(
+                        'Lewati untuk sekarang',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black38,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.black38,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Text('Remember Me', style: TextStyle(fontSize: 13)),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                // Login Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
                   ),
-                ),
-
-                const SizedBox(height: 14),
-
-                const Text('Or', style: TextStyle(fontSize: 13, color: Colors.black54)),
-
-                const SizedBox(height: 14),
-
-                // Sign up Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterPage()),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black87,
-                      side: const BorderSide(color: Colors.black87),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _inputField({
-    required TextEditingController controller,
-    required String hint,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscure = false,
-    Widget? suffix,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black38, fontSize: 14),
-        filled: true,
-        fillColor: Colors.white,
-        suffixIcon: suffix,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.black26, width: 0.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.black54, width: 1),
-        ),
+  Widget _chip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.22),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
