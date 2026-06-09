@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'booking.dart';
+import 'notification_page.dart';
+import 'chat/chat_list_page.dart';
+import 'search_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -191,10 +194,16 @@ class _DashboardPageState extends State<DashboardPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _circleButton(Icons.notifications_none),
+              _circleButton(Icons.notifications_none, onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const NotificationPage()));
+              }),
               const Text("VenueKitaAja",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-              _circleButton(Icons.chat_bubble_outline),
+              _circleButton(Icons.chat_bubble_outline, onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ChatListPage()));
+              }),
             ],
           ),
           const SizedBox(height: 10),
@@ -208,18 +217,26 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // Search bar
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
+          // Search bar — tap navigates to SearchPage
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchPage()),
             ),
-            child: const TextField(
-              decoration: InputDecoration(
-                hintText: "Venue or Event Organizer",
-                prefixIcon: Icon(Icons.search),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const AbsorbPointer(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Venue or Event Organizer",
+                    prefixIcon: Icon(Icons.search),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
               ),
             ),
           ),
@@ -352,14 +369,17 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _circleButton(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.35),
-        shape: BoxShape.circle,
+  Widget _circleButton(IconData icon, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.35),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon),
       ),
-      child: Icon(icon),
     );
   }
 }

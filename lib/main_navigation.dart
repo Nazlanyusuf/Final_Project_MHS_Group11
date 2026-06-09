@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'dashboard.dart'; 
+import 'dashboard.dart';
+import 'wishlist.dart';
+import 'activity.dart';
+import 'profile_page.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -14,10 +17,10 @@ class _MainNavigationState extends State<MainNavigation> {
 
   // ─── Daftar halaman ──────────────────────────────────────────────
   final List<Widget> _pages = const [
-    DashboardPage(),                             // index 0 → Home
-    _PlaceholderPage(label: 'Wishlist'),         // index 1
-    _PlaceholderPage(label: 'Activity'),         // index 2
-    _PlaceholderPage(label: 'Profile'),          // index 3
+    DashboardPage(),   // index 0 → Home
+    WishlistPage(),    // index 1 → Wishlist
+    ActivityPage(),    // index 2 → Activity
+    ProfilePage(),     // index 3 → Profile
   ];
 
   static const _navItems = [
@@ -106,23 +109,4 @@ class _NavItem {
     required this.activeIcon,
     required this.label,
   });
-}
-
-
-class _PlaceholderPage extends StatelessWidget {
-  final String label;
-  const _PlaceholderPage({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          '$label Page\n(belum dibuat)',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 18, color: Colors.grey),
-        ),
-      ),
-    );
-  }
 }
