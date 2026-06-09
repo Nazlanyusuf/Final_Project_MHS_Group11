@@ -208,14 +208,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 10),
           // Subtitle
-          const Text(
-            'Book venues and event organizers easily and\nsecurely in one platform',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white,
-              height: 1.45,
-            ),
-          ),
           const SizedBox(height: 16),
           // Search bar — tap navigates to SearchPage
           GestureDetector(
