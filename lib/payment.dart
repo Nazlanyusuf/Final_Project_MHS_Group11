@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'payment_success_page.dart';
 
 class PaymentPage extends StatefulWidget {
   final String packageName;
@@ -531,21 +532,14 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _onPayNow() {
-    // Navigate to confirm page or show success dialog
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Payment Confirmed'),
-        content: Text(
-          'Pembayaran ${_formatRupiah(_total)} berhasil diproses.',
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentSuccessPage(
+          packageName: widget.packageName,
+          eventName: widget.eventName,
+          total: _total,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }
