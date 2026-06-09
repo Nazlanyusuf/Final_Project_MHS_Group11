@@ -16,11 +16,59 @@ class BookingFormPage extends StatefulWidget {
 }
 
 class _BookingFormPageState extends State<BookingFormPage> {
-  final TextEditingController eventName     = TextEditingController();
-  final TextEditingController dateController    = TextEditingController();
-  final TextEditingController guestController   = TextEditingController();
+  final TextEditingController eventName          = TextEditingController();
+  final TextEditingController dateController     = TextEditingController();
+  final TextEditingController guestController    = TextEditingController();
   final TextEditingController locationController = TextEditingController();
-  final TextEditingController notesController   = TextEditingController();
+  final TextEditingController notesController    = TextEditingController();
+
+  bool _guestAlertShown = false;
+
+  void _onGuestChanged(String value) {
+    if (_guestAlertShown) return;
+    if (value.isEmpty) return;
+    if (RegExp(r'[^0-9]').hasMatch(value)) {
+      // Remove non-digit characters silently
+      final cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
+      guestController.value = TextEditingValue(
+        text: cleaned,
+        selection: TextSelection.collapsed(offset: cleaned.length),
+      );
+      // Show alert once
+      _guestAlertShown = true;
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.numbers_outlined, color: Color(0xFF6DB6E3), size: 24),
+              SizedBox(width: 8),
+              Text('Hanya Angka', style: TextStyle(fontSize: 16)),
+            ],
+          ),
+          content: const Text(
+            'Jumlah tamu hanya boleh diisi dengan angka.\nContoh: 150',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF69B7F4),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
+              ),
+              child: const Text('Mengerti'),
+            ),
+          ],
+        ),
+      ).then((_) => _guestAlertShown = false);
+    }
+  }
 
   double _parsePrice(String priceStr) {
     final cleaned = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
@@ -262,7 +310,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
                       "Guests *",
                       "e.g. 300",
                       guestController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
+                      onChanged: _onGuestChanged,
                     ),
                   ),
                 ],
@@ -416,6 +465,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
     TextEditingController controller, {
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
+    void Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,6 +476,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
           controller: controller,
           maxLines: maxLines,
           keyboardType: keyboardType,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
