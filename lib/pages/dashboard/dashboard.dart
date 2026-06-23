@@ -144,138 +144,149 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 22),
               _buildSectionTitle(),
               const SizedBox(height: 14),
-              if (_filteredVenues.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Belum ada EO untuk kategori ini',
-                          style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                        ),
-                      ],
+              _buildVenueList(),
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVenueList() {
+    final venues = _filteredVenues;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+          child: child,
+        ),
+      ),
+      child: venues.isEmpty
+          ? Padding(
+              key: const ValueKey('__empty__'),
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Belum ada EO untuk kategori ini',
+                      style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                     ),
+                  ],
+                ),
+              ),
+            )
+          : ListView.builder(
+              key: ValueKey(_selectedCategory),
+              itemCount: venues.length,
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) => _buildVenueCard(venues[index]),
+            ),
+    );
+  }
+
+  Widget _buildVenueCard(Map<String, dynamic> venue) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BookingDetailPage()),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Hero(
+                tag: venue["title"],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Image.network(
+                    venue["image"],
+                    width: 110,
+                    height: 110,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ListView.builder(
-                itemCount: _filteredVenues.length,
-                shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final venue = _filteredVenues[index];
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BookingDetailPage(),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        venue["title"],
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                          const SizedBox(width: 3),
+                          Text(venue["rating"], style: const TextStyle(fontSize: 12)),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.chat_bubble_outline, size: 14, color: Colors.grey),
+                          const SizedBox(width: 3),
+                          Text("${venue["review"]} Review",
+                              style: const TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on, size: 14, color: Colors.black54),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(venue["location"],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 12),
+                                overflow: TextOverflow.ellipsis),
                           ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Hero(
-                              tag: venue["title"],
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: Image.network(
-                                  venue["image"],
-                                  width: 110,
-                                  height: 110,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      venue["title"],
-                                      style: const TextStyle(
-                                          fontSize: 14, fontWeight: FontWeight.w700),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                                        const SizedBox(width: 3),
-                                        Text(venue["rating"],
-                                            style: const TextStyle(fontSize: 12)),
-                                        const SizedBox(width: 8),
-                                        const Icon(Icons.chat_bubble_outline,
-                                            size: 14, color: Colors.grey),
-                                        const SizedBox(width: 3),
-                                        Text("${venue["review"]} Review",
-                                            style: const TextStyle(fontSize: 12)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.location_on,
-                                            size: 14, color: Colors.black54),
-                                        const SizedBox(width: 3),
-                                        Expanded(
-                                          child: Text(venue["location"],
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12),
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          const Text("Start from",
-                                              style: TextStyle(
-                                                  fontSize: 10, color: Colors.grey)),
-                                          Text(venue["price"],
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13)),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            const Text("Start from",
+                                style: TextStyle(fontSize: 10, color: Colors.grey)),
+                            Text(venue["price"],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13)),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -352,7 +363,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 return GestureDetector(
                   onTap: () => setState(() => _selectedCategory = item["title"] as String),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
                     width: 64,
                     margin: EdgeInsets.only(right: isLast ? 0 : 10),
                     padding: const EdgeInsets.all(8),
@@ -466,8 +478,24 @@ class _DashboardPageState extends State<DashboardPage> {
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(label,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.08, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            ),
+          ),
+          child: Text(
+            label,
+            key: ValueKey(label),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
     );
   }

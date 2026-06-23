@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'main_navigation.dart';
 import 'pages/auth/login_page.dart';
 import 'services/auth_service.dart';
+import 'utils/smooth_transitions.dart';
 
 void main() {
   runApp(const PlanIt());
@@ -18,6 +19,7 @@ class PlanIt extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
+        pageTransitionsTheme: smoothPageTransitionsTheme,
       ),
       home: const _AuthGate(),
     );

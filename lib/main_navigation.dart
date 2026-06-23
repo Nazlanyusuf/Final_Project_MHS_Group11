@@ -34,9 +34,18 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
+      body: Stack(
+        children: List.generate(_pages.length, (i) {
+          return AnimatedOpacity(
+            opacity: i == _selectedIndex ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            child: IgnorePointer(
+              ignoring: i != _selectedIndex,
+              child: _pages[i],
+            ),
+          );
+        }),
       ),
 
       bottomNavigationBar: _buildBottomNav(),
@@ -65,7 +74,8 @@ class _MainNavigationState extends State<MainNavigation> {
           return GestureDetector(
             onTap: () => setState(() => _selectedIndex = index),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: isSelected
