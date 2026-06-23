@@ -199,11 +199,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLogo() {
-    return Row(
+    return const Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text(
+        Text(
           'Plan',
           style: TextStyle(
             fontSize: 42,
@@ -212,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 1,
           ),
         ),
-        const Stack(
+        Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
@@ -235,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-        const Text(
+        Text(
           't',
           style: TextStyle(
             fontSize: 42,
