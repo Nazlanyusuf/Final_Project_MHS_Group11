@@ -198,7 +198,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const NotificationPage()));
               }),
-              const Text("VenueKitaAja",
+              const Text("PlanIt",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
               _circleButton(Icons.chat_bubble_outline, onTap: () {
                 Navigator.push(context,
