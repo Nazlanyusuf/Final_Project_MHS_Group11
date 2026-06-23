@@ -42,7 +42,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 28),
                         const Text(
-                          'VenueKitaAja',
+                          'PlanIt',
                           style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
