@@ -12,6 +12,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  String _selectedCategory = 'All\nProducts';
+
   final List<Map<String, dynamic>> categories = [
     {"title": "Wedding",    "icon": Icons.favorite,    "color": Colors.pink},
     {"title": "Concert",    "icon": Icons.music_note,  "color": Colors.purple},
@@ -21,9 +23,10 @@ class _DashboardPageState extends State<DashboardPage> {
     {"title": "All\nProducts", "icon": Icons.apps,     "color": Colors.grey},
   ];
 
-  final List<Map<String, dynamic>> venues = [
+  static const List<Map<String, dynamic>> _allVenues = [
     {
       "title": "Le Blanc Wedding Organizer",
+      "category": "Wedding",
       "rating": "4.9",
       "review": "97",
       "location": "BSD",
@@ -31,14 +34,101 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "title": "Elegant Wedding Organizer",
+      "category": "Wedding",
+      "rating": "4.8",
+      "review": "84",
+      "location": "Jakarta Selatan",
+      "price": "Rp 12.000.000",
+      "image": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "Amanjiwo Exclusive Wedding",
+      "category": "Wedding",
+      "rating": "5.0",
+      "review": "42",
+      "location": "Jawa Tengah",
+      "price": "Rp 30.000.000",
+      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
       "title": "Party Planner Birthday Organizer",
+      "category": "Birthday",
       "rating": "4.4",
       "review": "125",
       "location": "JabaDeTaBek",
       "price": "Rp 5.000.000",
       "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=1000&auto=format&fit=crop",
     },
+    {
+      "title": "Happy Moment Birthday Crew",
+      "category": "Birthday",
+      "rating": "4.3",
+      "review": "88",
+      "location": "Tangerang",
+      "price": "Rp 3.500.000",
+      "image": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "Groovy Event Organizer",
+      "category": "Concert",
+      "rating": "4.6",
+      "review": "80",
+      "location": "ICE BSD",
+      "price": "Rp 10.000.000",
+      "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "Soundwave Concert Production",
+      "category": "Concert",
+      "rating": "4.7",
+      "review": "63",
+      "location": "Jakarta Utara",
+      "price": "Rp 15.000.000",
+      "image": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "BizTalk Seminar Organizer",
+      "category": "Seminar",
+      "rating": "4.5",
+      "review": "55",
+      "location": "SCBD Jakarta",
+      "price": "Rp 6.000.000",
+      "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "ProConference Planner",
+      "category": "Seminar",
+      "rating": "4.4",
+      "review": "37",
+      "location": "Serpong",
+      "price": "Rp 4.500.000",
+      "image": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "SnapShot Studio",
+      "category": "Photoshoot",
+      "rating": "4.8",
+      "review": "112",
+      "location": "Kemang, Jakarta",
+      "price": "Rp 2.000.000",
+      "image": "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+      "title": "LensArt Photography",
+      "category": "Photoshoot",
+      "rating": "4.6",
+      "review": "74",
+      "location": "Bintaro",
+      "price": "Rp 1.500.000",
+      "image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1000&auto=format&fit=crop",
+    },
   ];
+
+  List<Map<String, dynamic>> get _filteredVenues {
+    if (_selectedCategory == 'All\nProducts') return _allVenues;
+    return _allVenues.where((v) => v['category'] == _selectedCategory).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +144,29 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 22),
               _buildSectionTitle(),
               const SizedBox(height: 14),
+              if (_filteredVenues.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Belum ada EO untuk kategori ini',
+                          style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ListView.builder(
-                itemCount: venues.length,
+                itemCount: _filteredVenues.length,
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  final venue = venues[index];
+                  final venue = _filteredVenues[index];
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.only(bottom: 16),
@@ -242,22 +348,22 @@ class _DashboardPageState extends State<DashboardPage> {
               itemBuilder: (context, index) {
                 final item = categories[index];
                 final isLast = index == categories.length - 1;
+                final isSelected = _selectedCategory == item["title"];
                 return GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text("${item["title"].toString().replaceAll('\n', ' ')} clicked"),
-                      ),
-                    );
-                  },
-                  child: Container(
+                  onTap: () => setState(() => _selectedCategory = item["title"] as String),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     width: 64,
                     margin: EdgeInsets.only(right: isLast ? 0 : 10),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isSelected
+                          ? (item["color"] as Color).withOpacity(0.18)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isSelected
+                          ? Border.all(color: item["color"] as Color, width: 1.5)
+                          : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.06),
@@ -272,7 +378,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: (item["color"] as Color).withOpacity(0.15),
+                            color: (item["color"] as Color).withOpacity(isSelected ? 0.3 : 0.15),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(item["icon"] as IconData,
@@ -284,8 +390,10 @@ class _DashboardPageState extends State<DashboardPage> {
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 9.5, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                              color: isSelected ? (item["color"] as Color) : Colors.black87),
                         ),
                       ],
                     ),
@@ -351,12 +459,15 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildSectionTitle() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 18),
+    final label = _selectedCategory == 'All\nProducts'
+        ? 'Explore Deals For You'
+        : _selectedCategory.replaceAll('\n', ' ');
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text("Explore Deals For You",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        child: Text(label,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
       ),
     );
   }
