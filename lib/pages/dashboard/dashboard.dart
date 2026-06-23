@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'booking.dart';
-import 'notification_page.dart';
-import 'chat/chat_list_page.dart';
-import 'search_page.dart';
+import '../booking/booking.dart';
+import '../notification_page.dart';
+import '../chat/chat_list_page.dart';
+import '../search_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});

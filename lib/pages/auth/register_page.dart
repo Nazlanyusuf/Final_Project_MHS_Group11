@@ -1,4 +1,4 @@
-import 'package:final_project_mhs/serivces/auth_service.dart';
+import 'package:final_project_mhs/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

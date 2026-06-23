@@ -1,4 +1,4 @@
-import 'package:final_project_mhs/payment.dart';
+import 'package:final_project_mhs/pages/payment/payment.dart';
 import 'package:flutter/material.dart';
 
 class BookingFormPage extends StatefulWidget {

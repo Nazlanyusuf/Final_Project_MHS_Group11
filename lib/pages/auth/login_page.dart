@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_form_page.dart';
 import 'register_page.dart';
-import '../main_navigation.dart';
+import '../../main_navigation.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

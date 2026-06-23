@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'main_navigation.dart';
+import '../../main_navigation.dart';
 
 class PaymentSuccessPage extends StatefulWidget {
   final String packageName;

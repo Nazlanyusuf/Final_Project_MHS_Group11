@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login/login_page.dart';
-import 'serivces/auth_service.dart';
+import '../auth/login_page.dart';
+import 'package:final_project_mhs/services/auth_service.dart';
 import 'personal_info_page.dart';
 
 class ProfilePage extends StatelessWidget {

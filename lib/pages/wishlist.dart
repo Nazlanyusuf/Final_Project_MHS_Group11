@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'booking.dart';
+import 'booking/booking.dart';
 
 class WishlistPage extends StatefulWidget {
   const WishlistPage({super.key});

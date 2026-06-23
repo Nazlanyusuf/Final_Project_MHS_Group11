@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'dashboard.dart';
-import 'wishlist.dart';
-import 'activity.dart';
-import 'profile_page.dart';
+import 'pages/dashboard/dashboard.dart';
+import 'pages/wishlist.dart';
+import 'pages/activity.dart';
+import 'pages/profile/profile_page.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
