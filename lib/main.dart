@@ -4,17 +4,17 @@ import 'login/login_page.dart';
 import 'serivces/auth_service.dart';
 
 void main() {
-  runApp(const VenueKitaAja());
+  runApp(const PlanIt());
 }
 
-class VenueKitaAja extends StatelessWidget {
-  const VenueKitaAja({super.key});
+class PlanIt extends StatelessWidget {
+  const PlanIt({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'VenueKitaAja',
+      title: 'PlanIt',
       theme: ThemeData(
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
