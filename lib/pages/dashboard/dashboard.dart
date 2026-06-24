@@ -309,7 +309,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
       decoration: const BoxDecoration(
         color: Color(0xFF6DB6E3),
         borderRadius: BorderRadius.only(
@@ -320,114 +320,129 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title row
+          // ── Top icons ───────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _circleButton(Icons.notifications_none, onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const NotificationPage()));
-              }),
-              const Text("PlanIt",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-              _circleButton(Icons.chat_bubble_outline, onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ChatListPage()));
-              }),
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const NotificationPage())),
+                child: const Icon(Icons.notifications_none_outlined,
+                    size: 28, color: Colors.white),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ChatListPage())),
+                child: const Icon(Icons.chat_bubble_outline,
+                    size: 28, color: Colors.white),
+              ),
             ],
           ),
-          const SizedBox(height: 10),
-          // Subtitle
           const SizedBox(height: 16),
-          // Search bar — tap navigates to SearchPage
+          // ── Search bar ──────────────────────────────
           GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SearchPage()),
-            ),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const SearchPage())),
             child: Container(
+              height: 48,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const AbsorbPointer(
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: "Venue or Event Organizer",
-                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Venue or Event Organizer',
+                    hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
+                    prefixIcon:
+                        Icon(Icons.search, color: Colors.black45, size: 22),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                    contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 18),
-          // Categories (horizontal scroll)
-          SizedBox(
-            height: 95,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final item = categories[index];
-                final isLast = index == categories.length - 1;
-                final isSelected = _selectedCategory == item["title"];
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedCategory = item["title"] as String),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    width: 64,
-                    margin: EdgeInsets.only(right: isLast ? 0 : 10),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (item["color"] as Color).withOpacity(0.18)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: isSelected
-                          ? Border.all(color: item["color"] as Color, width: 1.5)
-                          : null,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: (item["color"] as Color).withOpacity(isSelected ? 0.3 : 0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(item["icon"] as IconData,
-                              color: item["color"] as Color, size: 20),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          item["title"] as String,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                              color: isSelected ? (item["color"] as Color) : Colors.black87),
-                        ),
-                      ],
-                    ),
+          const SizedBox(height: 10),
+          // ── Subtitle ────────────────────────────────
+          const Text(
+            'Book venues and event organizers easily and securely in one platform',
+            style: TextStyle(fontSize: 13, color: Colors.white, height: 1.4),
+          ),
+          const SizedBox(height: 16),
+          // ── Category chips card ─────────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: List.generate(
+                    5,
+                    (i) => Expanded(child: _buildCategoryChip(categories[i])),
                   ),
-                );
-              },
+                ),
+                const SizedBox(height: 10),
+                _buildCategoryChip(categories[5]),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryChip(Map<String, dynamic> item) {
+    final isSelected = _selectedCategory == item['title'];
+    final color = item['color'] as Color;
+    return GestureDetector(
+      onTap: () =>
+          setState(() => _selectedCategory = item['title'] as String),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(isSelected ? 0.22 : 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(item['icon'] as IconData,
+                  color: color, size: 18),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              (item['title'] as String).replaceAll('\n', ' '),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight:
+                    isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? color : Colors.black87,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -513,17 +528,4 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _circleButton(IconData icon, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.35),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon),
-      ),
-    );
-  }
 }
