@@ -3,6 +3,8 @@ import '../auth/login_page.dart';
 import '../reminders/event_reminders_page.dart';
 import 'package:final_project_mhs/widgets/guest_view.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
+import 'package:final_project_mhs/services/booking_service.dart';
+import 'package:final_project_mhs/services/wishlist_service.dart';
 import 'personal_info_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -21,6 +23,10 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoggedIn = false;
   bool _isLoading = true;
 
+  int _bookingCount  = 0;
+  int _wishlistCount = 0;
+  int _reviewCount   = 0;
+
   @override
   void initState() {
     super.initState();
@@ -34,15 +40,40 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() { _isLoggedIn = false; _isLoading = false; });
       return;
     }
-    final user = await AuthService.getUser();
+    final userFuture      = AuthService.getUser();
+    final bookingFuture   = BookingService.getBookings();
+    final wishlistFuture  = WishlistService.getWishlist();
+    final user      = await userFuture;
+    final bookings  = await bookingFuture;
+    final wishlist  = await wishlistFuture;
     if (mounted) {
-      setState(() { _user = user; _isLoggedIn = true; _isLoading = false; });
+      setState(() {
+        _user          = user;
+        _bookingCount  = bookings.length;
+        _wishlistCount = wishlist.length;
+        _reviewCount   = 0;
+        _isLoggedIn    = true;
+        _isLoading     = false;
+      });
     }
   }
 
   Future<void> _loadUser() async {
     final user = await AuthService.getUser();
     if (mounted) setState(() => _user = user);
+  }
+
+  Future<void> _reloadStats() async {
+    final bookingF  = BookingService.getBookings();
+    final wishlistF = WishlistService.getWishlist();
+    final bookings  = await bookingF;
+    final wishlist  = await wishlistF;
+    if (mounted) {
+      setState(() {
+        _bookingCount  = bookings.length;
+        _wishlistCount = wishlist.length;
+      });
+    }
   }
 
   String get _displayName => _user?['name'] ?? _user?['username'] ?? 'User';
@@ -66,175 +97,214 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
+        child: RefreshIndicator(
+          color: _blue,
+          onRefresh: () async {
+            await _loadUser();
+            await _reloadStats();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
 
-              // ── Profile card ──────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F6FA),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.black.withOpacity(0.06)),
+                // ── Profile card ──────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F6FA),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.black.withOpacity(0.06)),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 38,
+                          backgroundColor: _blue.withOpacity(0.2),
+                          child: const Icon(Icons.person, size: 44, color: _blue),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _displayName,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _username,
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.black45),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: _blue.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.email_outlined,
+                                        size: 13, color: Color(0xFF3A8FC4)),
+                                    const SizedBox(width: 5),
+                                    Flexible(
+                                      child: Text(
+                                        _email,
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF3A8FC4)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+
+                // ── Stats row ─────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 18),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 38,
-                        backgroundColor: _blue.withOpacity(0.2),
-                        child: const Icon(Icons.person, size: 44, color: _blue),
-                      ),
-                      const SizedBox(width: 16),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _displayName,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _username,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.black45),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: _blue.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.email_outlined,
-                                      size: 13, color: Color(0xFF3A8FC4)),
-                                  const SizedBox(width: 5),
-                                  Flexible(
-                                    child: Text(
-                                      _email,
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF3A8FC4)),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        child: _statTile(
+                          icon: Icons.calendar_today_outlined,
+                          value: _bookingCount.toString(),
+                          label: 'Booking',
+                          onTap: () {
+                            widget.onTabChange?.call(2);
+                            _reloadStats();
+                          },
+                        ),
+                      ),
+                      Container(width: 1, height: 44, color: Colors.black12),
+                      Expanded(
+                        child: _statTile(
+                          icon: Icons.favorite_border,
+                          value: _wishlistCount.toString(),
+                          label: 'Wishlist',
+                          onTap: () {
+                            widget.onTabChange?.call(1);
+                            _reloadStats();
+                          },
+                        ),
+                      ),
+                      Container(width: 1, height: 44, color: Colors.black12),
+                      Expanded(
+                        child: _statTile(
+                          icon: Icons.star_border_outlined,
+                          value: _reviewCount.toString(),
+                          label: 'Reviews',
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
 
-              // ── Stats row ─────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 28, vertical: 18),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _stat(Icons.calendar_today_outlined, '0', 'Booking'),
-                    Container(width: 1, height: 34, color: Colors.black12),
-                    _stat(Icons.favorite_border, '0', 'Wishlist'),
-                    Container(width: 1, height: 34, color: Colors.black12),
-                    _stat(Icons.star_border_outlined, '0', 'Reviews'),
-                  ],
+                const Divider(height: 1, color: Colors.black12),
+                const SizedBox(height: 18),
+
+                // ── Account section ───────────────────────────────────
+                _sectionHeader('Account'),
+                _menuItem(
+                  context,
+                  Icons.person_outline,
+                  'Personal Info',
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PersonalInfoPage(user: _user),
+                      ),
+                    );
+                    _loadUser();
+                  },
                 ),
-              ),
-
-              const Divider(height: 1, color: Colors.black12),
-              const SizedBox(height: 18),
-
-              // ── Account section ───────────────────────────────────
-              _sectionHeader('Account'),
-              _menuItem(
-                context,
-                Icons.person_outline,
-                'Personal Info',
-                onTap: () async {
-                  await Navigator.push(
+                _menuItem(
+                  context,
+                  Icons.access_time_rounded,
+                  'My Activity',
+                  onTap: () {
+                    widget.onTabChange?.call(2);
+                    _reloadStats();
+                  },
+                ),
+                _menuItem(
+                  context,
+                  Icons.favorite_border,
+                  'My Wishlist',
+                  onTap: () {
+                    widget.onTabChange?.call(1);
+                    _reloadStats();
+                  },
+                ),
+                _menuItem(
+                  context,
+                  Icons.notifications_none_outlined,
+                  'Event Reminders',
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => PersonalInfoPage(user: _user),
-                    ),
-                  );
-                  _loadUser();
-                },
-              ),
-              _menuItem(
-                context,
-                Icons.access_time_rounded,
-                'My Activity',
-                onTap: () => widget.onTabChange?.call(2),
-              ),
-              _menuItem(
-                context,
-                Icons.favorite_border,
-                'My Wishlist',
-                onTap: () => widget.onTabChange?.call(1),
-              ),
-              _menuItem(
-                context,
-                Icons.notifications_none_outlined,
-                'Event Reminders',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const EventRemindersPage()),
+                        builder: (_) => const EventRemindersPage()),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
-              // ── Log Out ───────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await AuthService.logout();
-                      if (context.mounted) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const LoginPage()),
-                          (_) => false,
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _coral.withOpacity(0.12),
-                      foregroundColor: _coral,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text(
-                      'Log Out',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w700),
+                // ── Log Out ───────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await AuthService.logout();
+                        if (context.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const LoginPage()),
+                            (_) => false,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _coral.withOpacity(0.12),
+                        foregroundColor: _coral,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text(
+                        'Log Out',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 36),
-            ],
+                const SizedBox(height: 36),
+              ],
+            ),
           ),
         ),
       ),
@@ -249,23 +319,50 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _stat(IconData icon, String value, String label) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.black45),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _statTile({
+    required IconData icon,
+    required String value,
+    required String label,
+    VoidCallback? onTap,
+  }) {
+    final tappable = onTap != null;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(value,
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w700)),
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 11, color: Colors.black45)),
+            Icon(icon, size: 20,
+                color: tappable ? _blue : Colors.black45),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: tappable ? _blue : Colors.black87,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                      fontSize: 11, color: Colors.black45),
+                ),
+              ],
+            ),
+            if (tappable) ...[
+              const SizedBox(width: 2),
+              const Icon(Icons.arrow_forward_ios,
+                  size: 10, color: Colors.black38),
+            ],
           ],
         ),
-      ],
+      ),
     );
   }
 
