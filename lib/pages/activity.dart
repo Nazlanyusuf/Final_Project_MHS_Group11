@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_mhs/services/booking_service.dart';
+import 'package:final_project_mhs/services/auth_service.dart';
 import 'package:final_project_mhs/pages/payment/payment.dart';
+import 'package:final_project_mhs/pages/auth/login_page.dart';
 import 'chat/chat_inside_page.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -20,12 +22,20 @@ class _ActivityPageState extends State<ActivityPage>
   List<Map<String, dynamic>> _completed = [];
   List<Map<String, dynamic>> _cancelled = [];
   bool _isLoading = true;
+  bool _isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _load();
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    if (!mounted) return;
+    setState(() => _isLoggedIn = loggedIn);
+    if (loggedIn) _load();
   }
 
   @override
@@ -152,7 +162,9 @@ class _ActivityPageState extends State<ActivityPage>
           ],
         ),
       ),
-      body: _isLoading
+      body: !_isLoggedIn
+          ? _buildGuestView()
+          : _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: _blue))
           : TabBarView(
@@ -170,6 +182,56 @@ class _ActivityPageState extends State<ActivityPage>
                     statusColor: Colors.red),
               ],
             ),
+    );
+  }
+
+  Widget _buildGuestView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_outline, size: 72, color: Colors.grey.shade300),
+            const SizedBox(height: 20),
+            const Text(
+              'Anda Belum Login',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Login untuk melihat riwayat dan aktivitas booking Anda.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: Colors.black45),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (_) => false,
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Text('Login Sekarang',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

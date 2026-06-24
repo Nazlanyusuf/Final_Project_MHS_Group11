@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/services/wishlist_service.dart';
+import 'package:final_project_mhs/services/auth_service.dart';
+import 'package:final_project_mhs/utils/auth_guard.dart';
 import '../booking/booking.dart';
 import '../notification_page.dart';
 import '../chat/chat_list_page.dart';
@@ -13,6 +16,38 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   String _selectedCategory = 'All\nProducts';
+  Set<int> _wishlistedIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWishlistIds();
+  }
+
+  Future<void> _loadWishlistIds() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    if (!loggedIn) return;
+    final data = await WishlistService.getWishlist();
+    if (mounted) {
+      setState(() {
+        _wishlistedIds = data.map((e) => e['id'] as int? ?? 0).toSet();
+      });
+    }
+  }
+
+  Future<void> _toggleWishlist(int venueId) async {
+    final ok = await AuthGuard.check(context);
+    if (!ok) return;
+    final wasWishlisted = _wishlistedIds.contains(venueId);
+    setState(() {
+      if (wasWishlisted) {
+        _wishlistedIds.remove(venueId);
+      } else {
+        _wishlistedIds.add(venueId);
+      }
+    });
+    await WishlistService.toggleWishlist(venueId);
+  }
 
   final List<Map<String, dynamic>> categories = [
     {"title": "Wedding",    "icon": Icons.favorite,    "color": Colors.pink},
@@ -209,15 +244,24 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildVenueCard(Map<String, dynamic> venue) {
+    final venueId = venue['id'] as int? ?? 1;
+    final isWishlisted = _wishlistedIds.contains(venueId);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BookingDetailPage(venueId: venue['id'] as int? ?? 1),
-          ),
-        ),
+        onTap: () async {
+          final ok = await AuthGuard.check(context);
+          if (!ok) return;
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BookingDetailPage(venueId: venueId),
+              ),
+            );
+          }
+        },
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -250,20 +294,48 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        venue["title"],
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      // Title + wishlist heart
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              venue["title"],
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleWishlist(venueId),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 6),
+                              child: Icon(
+                                isWishlisted
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isWishlisted
+                                    ? Colors.redAccent
+                                    : Colors.black38,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                          const Icon(Icons.star,
+                              color: Colors.amber, size: 16),
                           const SizedBox(width: 3),
-                          Text(venue["rating"], style: const TextStyle(fontSize: 12)),
+                          Text(venue["rating"],
+                              style: const TextStyle(fontSize: 12)),
                           const SizedBox(width: 8),
-                          const Icon(Icons.chat_bubble_outline, size: 14, color: Colors.grey),
+                          const Icon(Icons.chat_bubble_outline,
+                              size: 14, color: Colors.grey),
                           const SizedBox(width: 3),
                           Text("${venue["review"]} Review",
                               style: const TextStyle(fontSize: 12)),
@@ -272,13 +344,17 @@ class _DashboardPageState extends State<DashboardPage> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.location_on, size: 14, color: Colors.black54),
+                          const Icon(Icons.location_on,
+                              size: 14, color: Colors.black54),
                           const SizedBox(width: 3),
                           Expanded(
-                            child: Text(venue["location"],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 12),
-                                overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              venue["location"],
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -289,10 +365,12 @@ class _DashboardPageState extends State<DashboardPage> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const Text("Start from",
-                                style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                style: TextStyle(
+                                    fontSize: 10, color: Colors.grey)),
                             Text(venue["price"],
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 13)),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13)),
                           ],
                         ),
                       ),

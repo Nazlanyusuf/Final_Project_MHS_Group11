@@ -17,11 +17,26 @@ class _ProfilePageState extends State<ProfilePage> {
   static const _blue  = Color(0xFF6DB6E3);
 
   Map<String, dynamic>? _user;
+  bool _isLoggedIn = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    if (!mounted) return;
+    if (!loggedIn) {
+      setState(() { _isLoggedIn = false; _isLoading = false; });
+      return;
+    }
+    final user = await AuthService.getUser();
+    if (mounted) {
+      setState(() { _user = user; _isLoggedIn = true; _isLoading = false; });
+    }
   }
 
   Future<void> _loadUser() async {
@@ -35,6 +50,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator(color: _blue)),
+      );
+    }
+    if (!_isLoggedIn) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(child: _buildGuestView()),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -208,6 +235,64 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 36),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _blue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_outline,
+                  size: 64, color: _blue),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Anda Belum Login',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Login untuk mengakses profil, riwayat booking, dan fitur lainnya.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: Colors.black45, height: 1.5),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (_) => false,
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  elevation: 0,
+                ),
+                child: const Text('Login Sekarang',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
         ),
       ),
     );

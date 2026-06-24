@@ -190,6 +190,24 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 8),
+
+                // Skip button
+                TextButton(
+                  onPressed: () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const MainNavigation()),
+                    (_) => false,
+                  ),
+                  child: const Text(
+                    'Lewati untuk sekarang',
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
               ],
             ),
           ),
