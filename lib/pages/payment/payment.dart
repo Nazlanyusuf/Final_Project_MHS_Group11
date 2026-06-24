@@ -1,4 +1,5 @@
 import 'package:final_project_mhs/services/booking_service.dart';
+import 'package:final_project_mhs/services/activity_log_service.dart';
 import 'package:flutter/material.dart';
 import 'payment_success_page.dart';
 
@@ -567,6 +568,13 @@ class _PaymentPageState extends State<PaymentPage> {
     if (widget.bookingId != null) {
       await BookingService.completeBooking(widget.bookingId!);
     }
+
+    ActivityLogService.log(
+      type: 'payment_confirmed',
+      title: 'Pembayaran Dikonfirmasi',
+      subtitle: widget.packageName,
+      imageUrl: widget.imageUrl,
+    );
 
     if (!mounted) return;
     setState(() => _isPaying = false);

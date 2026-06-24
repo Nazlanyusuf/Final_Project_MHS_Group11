@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:final_project_mhs/utils/refreshable.dart';
 import 'package:final_project_mhs/services/venue_service.dart';
 import 'package:final_project_mhs/services/wishlist_service.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
+import 'package:final_project_mhs/services/activity_log_service.dart';
+import 'package:final_project_mhs/services/review_service.dart';
 import 'package:final_project_mhs/utils/auth_guard.dart';
 import 'package:final_project_mhs/widgets/venue_card.dart';
 import '../booking/booking.dart';
@@ -11,14 +12,14 @@ import '../notification_page.dart';
 import '../chat/chat_list_page.dart';
 import '../search_page.dart';
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends RefreshablePage {
   const DashboardPage({super.key});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
+class _DashboardPageState extends RefreshablePageState<DashboardPage>
     with WidgetsBindingObserver {
   String _selectedCategory = 'All\nProducts';
   List<Map<String, dynamic>> _venues = [];
@@ -34,6 +35,13 @@ class _DashboardPageState extends State<DashboardPage>
     {"title": "Photoshoot",    "icon": Icons.camera_alt, "color": Colors.teal},
     {"title": "All\nProducts", "icon": Icons.apps,       "color": Colors.grey},
   ];
+
+  @override
+  void refresh() {
+    _loadVenues();
+    _loadWishlistIds();
+    _checkUpcomingReminders();
+  }
 
   @override
   void initState() {
@@ -60,10 +68,24 @@ class _DashboardPageState extends State<DashboardPage>
   Future<void> _loadVenues() async {
     setState(() => _isVenueLoading = true);
     final cat = _selectedCategory == 'All\nProducts' ? null : _selectedCategory;
-    final data = await VenueService.getVenues(category: cat);
+    final venuesF  = VenueService.getVenues(category: cat);
+    final reviewsF = ReviewService.getMyReviews();
+    final venues  = await venuesF;
+    final reviews = await reviewsF;
+
+    // Merge local review counts into venue data for accurate display
+    final merged = venues.map((v) {
+      final venueId    = v['id'] as int? ?? 0;
+      final localCount = reviews.where((r) => r['venue_id'] == venueId).length;
+      if (localCount == 0) return v;
+      final apiCount = int.tryParse(
+              (v['review'] ?? v['review_count'] ?? '0').toString()) ?? 0;
+      return {...v, 'review': (apiCount + localCount).toString()};
+    }).toList();
+
     if (mounted) {
       setState(() {
-        _venues = data;
+        _venues = merged;
         _isVenueLoading = false;
       });
     }
@@ -81,26 +103,16 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Future<void> _checkUpcomingReminders() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('event_reminders');
-    if (raw == null) {
-      if (mounted) setState(() => _hasUpcomingReminders = false);
-      return;
-    }
-    final list =
-        List<Map<String, dynamic>>.from(jsonDecode(raw) as List);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final hasAny = list.any((r) {
-      final d = DateTime.tryParse(r['date'] as String? ?? '');
-      return d != null && !d.isBefore(today);
-    });
-    if (mounted) setState(() => _hasUpcomingReminders = hasAny);
+    final hasUnseen = await ActivityLogService.hasUnseen();
+    if (mounted) setState(() => _hasUpcomingReminders = hasUnseen);
   }
 
-  Future<void> _toggleWishlist(int venueId) async {
+  Future<void> _toggleWishlist(Map<String, dynamic> venue) async {
     final ok = await AuthGuard.check(context);
     if (!ok) return;
+    final venueId   = venue['id']        as int?    ?? 0;
+    final venueName = venue['title']     as String? ?? '';
+    final imageUrl  = venue['image_url'] as String? ?? '';
     final wasWishlisted = _wishlistedIds.contains(venueId);
     setState(() {
       if (wasWishlisted) {
@@ -110,6 +122,12 @@ class _DashboardPageState extends State<DashboardPage>
       }
     });
     await WishlistService.toggleWishlist(venueId);
+    ActivityLogService.log(
+      type: wasWishlisted ? 'wishlist_remove' : 'wishlist_add',
+      title: wasWishlisted ? 'Dihapus dari Wishlist' : 'Ditambahkan ke Wishlist',
+      subtitle: venueName,
+      imageUrl: imageUrl,
+    );
   }
 
   @override
@@ -209,7 +227,7 @@ class _DashboardPageState extends State<DashboardPage>
                 );
               }
             },
-            onWishlistTap: () => _toggleWishlist(venueId),
+            onWishlistTap: () => _toggleWishlist(venue),
           );
         },
       ),
@@ -266,6 +284,10 @@ class _DashboardPageState extends State<DashboardPage>
                   ],
                 ),
               ),
+
+              // ── PlanIt logo (center) ──────────────────────────
+              _buildLogo(),
+
               GestureDetector(
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(
@@ -337,6 +359,56 @@ class _DashboardPageState extends State<DashboardPage>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          'Plan',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            height: 1,
+          ),
+        ),
+        Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Text(
+              'I',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1565C0),
+                height: 1,
+              ),
+            ),
+            Positioned(
+              top: -8,
+              child: Icon(
+                Icons.location_on,
+                size: 10,
+                color: Color(0xFF1565C0),
+              ),
+            ),
+          ],
+        ),
+        Text(
+          't',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF1565C0),
+            height: 1,
+          ),
+        ),
+      ],
     );
   }
 

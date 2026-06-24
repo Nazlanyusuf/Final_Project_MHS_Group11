@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_mhs/services/venue_service.dart';
+import 'package:final_project_mhs/services/review_service.dart';
+import 'package:final_project_mhs/services/chat_service.dart';
+import 'package:final_project_mhs/services/activity_log_service.dart';
+import '../chat/chat_inside_page.dart';
 import 'booking_detail.dart';
 
 class BookingDetailPage extends StatefulWidget {
@@ -15,6 +19,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
 
   Map<String, dynamic>? _venue;
   bool _isLoading = true;
+  int _localReviewCount = 0;
 
   @override
   void initState() {
@@ -23,13 +28,35 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
   }
 
   Future<void> _loadVenue() async {
-    final data = await VenueService.getVenue(widget.venueId);
+    final venueF   = VenueService.getVenue(widget.venueId);
+    final reviewsF = ReviewService.getMyReviews();
+    final data    = await venueF;
+    final reviews = await reviewsF;
+    final localCount = reviews
+        .where((r) => r['venue_id'] == widget.venueId)
+        .length;
     if (mounted) {
       setState(() {
         _venue = data;
+        _localReviewCount = localCount;
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _openChat() async {
+    await ChatService.addOrMoveToTop(_title, imageUrl: _imageUrl);
+    await ActivityLogService.log(
+      type: 'chat_started',
+      title: 'Mulai Chat',
+      subtitle: _title,
+      imageUrl: _imageUrl,
+    );
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ChatInsidePage(venueName: _title)),
+    );
   }
 
   // ── Helpers ──────────────────────────────────────────────────────
@@ -42,8 +69,11 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
       'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop';
   String get _rating =>
       (_venue?['rating'] ?? '4.9').toString();
-  String get _reviewCount =>
-      (_venue?['review'] ?? _venue?['review_count'] ?? '0').toString();
+  int get _totalReviewCount {
+    final api = int.tryParse(
+        (_venue?['review'] ?? _venue?['review_count'] ?? '0').toString()) ?? 0;
+    return api + _localReviewCount;
+  }
   String get _price =>
       _venue?['price'] as String? ?? 'Rp 8.000.000';
 
@@ -139,6 +169,23 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.arrow_back_ios_new,
+                          color: Colors.white),
+                    ),
+                  ),
+                ),
+                // Chat button (top-right)
+                Positioned(
+                  top: 50,
+                  right: 20,
+                  child: GestureDetector(
+                    onTap: _openChat,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.chat_bubble_outline,
                           color: Colors.white),
                     ),
                   ),
@@ -256,7 +303,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Based on $_reviewCount reviews',
+                      'Based on $_totalReviewCount reviews',
                       style: const TextStyle(color: Colors.black54),
                     ),
                     const SizedBox(height: 14),

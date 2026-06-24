@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/utils/refreshable.dart';
 import 'package:final_project_mhs/services/booking_service.dart';
 import 'package:final_project_mhs/services/review_service.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
+import 'package:final_project_mhs/services/activity_log_service.dart';
 import 'package:final_project_mhs/pages/payment/payment.dart';
 import 'package:final_project_mhs/widgets/guest_view.dart';
 import 'chat/chat_inside_page.dart';
 
-class ActivityPage extends StatefulWidget {
+class ActivityPage extends RefreshablePage {
   const ActivityPage({super.key});
 
   @override
   State<ActivityPage> createState() => _ActivityPageState();
 }
 
-class _ActivityPageState extends State<ActivityPage>
+class _ActivityPageState extends RefreshablePageState<ActivityPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -25,6 +27,9 @@ class _ActivityPageState extends State<ActivityPage>
   Set<int> _reviewedIds = {};
   bool _isLoading  = true;
   bool _isLoggedIn = false;
+
+  @override
+  void refresh() => _checkLogin();
 
   @override
   void initState() {
@@ -145,6 +150,12 @@ class _ActivityPageState extends State<ActivityPage>
     );
     if (submitted == true && mounted) {
       setState(() => _reviewedIds.add(bookingId));
+      ActivityLogService.log(
+        type: 'review_added',
+        title: 'Review Ditambahkan',
+        subtitle: venueName,
+        imageUrl: imageUrl,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Review berhasil dikirim!'),

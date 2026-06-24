@@ -1,5 +1,6 @@
 import 'package:final_project_mhs/pages/payment/payment.dart';
 import 'package:final_project_mhs/services/booking_service.dart';
+import 'package:final_project_mhs/services/activity_log_service.dart';
 import 'package:flutter/material.dart';
 
 class BookingFormPage extends StatefulWidget {
@@ -239,6 +240,13 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
     final bookingId = (result['data'] as Map<String, dynamic>?)?['id'] as int?;
 
+    ActivityLogService.log(
+      type: 'booking_created',
+      title: 'Booking Berhasil',
+      subtitle: '${widget.packageName} — ${eventName.text.trim()}',
+      imageUrl: widget.imageUrl,
+    );
+
     Navigator.pop(context);
     Navigator.push(
       context,
@@ -363,7 +371,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
               _inputField(
                 "Event Name *",
-                "e.g. Wedding of Bowo & Joko",
+                "e.g. Wedding of Diaz dan Nanda",
                 eventName,
               ),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/utils/refreshable.dart';
 
 import 'pages/dashboard/dashboard.dart';
 import 'pages/wishlist.dart';
@@ -15,11 +16,17 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  final List<GlobalKey<RefreshablePageState>> _pageKeys = [
+    GlobalKey<RefreshablePageState>(),
+    GlobalKey<RefreshablePageState>(),
+    GlobalKey<RefreshablePageState>(),
+  ];
+
   // ─── Daftar halaman ──────────────────────────────────────────────
   late final List<Widget> _pages = [
-    const DashboardPage(),
-    const WishlistPage(),
-    const ActivityPage(),
+    DashboardPage(key: _pageKeys[0]),
+    WishlistPage(key: _pageKeys[1]),
+    ActivityPage(key: _pageKeys[2]),
     ProfilePage(onTabChange: (i) => setState(() => _selectedIndex = i)),
   ];
 
@@ -72,7 +79,12 @@ class _MainNavigationState extends State<MainNavigation> {
           final isSelected = _selectedIndex == index;
 
           return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = index),
+            onTap: () {
+              if (index < _pageKeys.length) {
+                _pageKeys[index].currentState?.refresh();
+              }
+              setState(() => _selectedIndex = index);
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,

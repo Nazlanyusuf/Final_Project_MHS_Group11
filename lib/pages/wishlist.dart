@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/utils/refreshable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:final_project_mhs/services/wishlist_service.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
@@ -6,14 +7,14 @@ import 'package:final_project_mhs/widgets/guest_view.dart';
 import 'package:final_project_mhs/pages/venue_picker_page.dart';
 import 'booking/booking.dart';
 
-class WishlistPage extends StatefulWidget {
+class WishlistPage extends RefreshablePage {
   const WishlistPage({super.key});
 
   @override
   State<WishlistPage> createState() => _WishlistPageState();
 }
 
-class _WishlistPageState extends State<WishlistPage> {
+class _WishlistPageState extends RefreshablePageState<WishlistPage> {
   static const _blue = Color(0xFF6DB6E3);
   static const _prefsKey = 'wishlist_collections';
 
@@ -21,6 +22,9 @@ class _WishlistPageState extends State<WishlistPage> {
   List<String> _collections = [];
   bool _isLoading = true;
   bool _isLoggedIn = false;
+
+  @override
+  void refresh() => _init();
 
   @override
   void initState() {

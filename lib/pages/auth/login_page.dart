@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
           'Plan',
           style: TextStyle(
             fontSize: 42,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w900,
             color: Colors.black87,
             height: 1,
           ),
@@ -238,8 +238,8 @@ class _LoginPageState extends State<LoginPage> {
               'I',
               style: TextStyle(
                 fontSize: 42,
-                fontWeight: FontWeight.w800,
-                color: Colors.black87,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1565C0),
                 height: 1,
               ),
             ),
@@ -257,8 +257,8 @@ class _LoginPageState extends State<LoginPage> {
           't',
           style: TextStyle(
             fontSize: 42,
-            fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF1565C0),
             height: 1,
           ),
         ),
