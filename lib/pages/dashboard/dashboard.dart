@@ -25,6 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   static const List<Map<String, dynamic>> _allVenues = [
     {
+      "id": 1,
       "title": "Le Blanc Wedding Organizer",
       "category": "Wedding",
       "rating": "4.9",
@@ -34,6 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 2,
       "title": "Elegant Wedding Organizer",
       "category": "Wedding",
       "rating": "4.8",
@@ -43,6 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 3,
       "title": "Amanjiwo Exclusive Wedding",
       "category": "Wedding",
       "rating": "5.0",
@@ -52,6 +55,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 4,
       "title": "Party Planner Birthday Organizer",
       "category": "Birthday",
       "rating": "4.4",
@@ -61,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 5,
       "title": "Happy Moment Birthday Crew",
       "category": "Birthday",
       "rating": "4.3",
@@ -70,6 +75,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 6,
       "title": "Groovy Event Organizer",
       "category": "Concert",
       "rating": "4.6",
@@ -79,6 +85,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 7,
       "title": "Soundwave Concert Production",
       "category": "Concert",
       "rating": "4.7",
@@ -88,6 +95,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 8,
       "title": "BizTalk Seminar Organizer",
       "category": "Seminar",
       "rating": "4.5",
@@ -97,6 +105,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 9,
       "title": "ProConference Planner",
       "category": "Seminar",
       "rating": "4.4",
@@ -106,6 +115,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 10,
       "title": "SnapShot Studio",
       "category": "Photoshoot",
       "rating": "4.8",
@@ -115,6 +125,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1000&auto=format&fit=crop",
     },
     {
+      "id": 11,
       "title": "LensArt Photography",
       "category": "Photoshoot",
       "rating": "4.6",
@@ -203,7 +214,9 @@ class _DashboardPageState extends State<DashboardPage> {
       child: GestureDetector(
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const BookingDetailPage()),
+          MaterialPageRoute(
+            builder: (_) => BookingDetailPage(venueId: venue['id'] as int? ?? 1),
+          ),
         ),
         child: Container(
           decoration: BoxDecoration(

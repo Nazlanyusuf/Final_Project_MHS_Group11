@@ -23,6 +23,7 @@ class _SearchPageState extends State<SearchPage> {
 
   static const List<Map<String, dynamic>> _venues = [
     {
+      "id": 1,
       "title": "Le Blanc Wedding",
       "rating": "4.9",
       "review": "97",
@@ -32,6 +33,7 @@ class _SearchPageState extends State<SearchPage> {
           "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=400&auto=format&fit=crop",
     },
     {
+      "id": 3,
       "title": "Amanjiwo Hotel",
       "rating": "4.4",
       "review": "125",
@@ -41,6 +43,7 @@ class _SearchPageState extends State<SearchPage> {
           "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=400&auto=format&fit=crop",
     },
     {
+      "id": 4,
       "title": "Party Planner Birthday Organizer",
       "rating": "4.4",
       "review": "125",
@@ -50,6 +53,7 @@ class _SearchPageState extends State<SearchPage> {
           "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=400&auto=format&fit=crop",
     },
     {
+      "id": 2,
       "title": "Elegant Wedding Organizer",
       "rating": "4.8",
       "review": "97",
@@ -59,6 +63,7 @@ class _SearchPageState extends State<SearchPage> {
           "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=400&auto=format&fit=crop",
     },
     {
+      "id": 6,
       "title": "Groovy Event Organizer",
       "rating": "4.6",
       "review": "80",
@@ -217,7 +222,9 @@ class _SearchPageState extends State<SearchPage> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const BookingDetailPage()),
+        MaterialPageRoute(
+          builder: (_) => BookingDetailPage(venueId: v['id'] as int? ?? 1),
+        ),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),

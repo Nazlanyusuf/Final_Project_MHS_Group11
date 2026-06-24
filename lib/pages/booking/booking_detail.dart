@@ -1,14 +1,17 @@
 import 'package:final_project_mhs/pages/payment/payment.dart';
+import 'package:final_project_mhs/services/booking_service.dart';
 import 'package:flutter/material.dart';
 
 class BookingFormPage extends StatefulWidget {
   final String packageName;
   final String price;
+  final int venueId;
 
   const BookingFormPage({
     super.key,
     required this.packageName,
     required this.price,
+    this.venueId = 1,
   });
 
   @override
@@ -23,6 +26,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
   final TextEditingController notesController    = TextEditingController();
 
   bool _guestAlertShown = false;
+  bool _isSubmitting = false;
 
   void _onGuestChanged(String value) {
     if (_guestAlertShown) return;
@@ -148,7 +152,21 @@ class _BookingFormPageState extends State<BookingFormPage> {
     );
   }
 
-  void _submit() {
+  String _toApiDate(String displayDate) {
+    const months = {
+      'January': '01', 'February': '02', 'March': '03', 'April': '04',
+      'May': '05', 'June': '06', 'July': '07', 'August': '08',
+      'September': '09', 'October': '10', 'November': '11', 'December': '12',
+    };
+    final parts = displayDate.split(' ');
+    if (parts.length < 3) return displayDate;
+    final day = parts[0].padLeft(2, '0');
+    final month = months[parts[1]] ?? '01';
+    final year = parts[2];
+    return '$year-$month-$day';
+  }
+
+  Future<void> _submit() async {
     if (eventName.text.trim().isEmpty) {
       _showRequiredAlert('Event Name');
       return;
@@ -171,6 +189,54 @@ class _BookingFormPageState extends State<BookingFormPage> {
         ) ??
         1;
 
+    setState(() => _isSubmitting = true);
+
+    final result = await BookingService.createBooking(
+      venueId: widget.venueId,
+      eventDate: _toApiDate(dateController.text.trim()),
+      eventName: eventName.text.trim(),
+      guestCount: guestCount,
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
+    );
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    if (result['success'] != true) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red, size: 24),
+              SizedBox(width: 8),
+              Text('Booking Gagal', style: TextStyle(fontSize: 16)),
+            ],
+          ),
+          content: Text(result['message'] ?? 'Terjadi kesalahan'),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF69B7F4),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
+              ),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final bookingId = (result['data'] as Map<String, dynamic>?)?['id'] as int?;
+
     Navigator.pop(context);
     Navigator.push(
       context,
@@ -182,6 +248,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
           guestCount: guestCount,
           packagePrice: _parsePrice(widget.price),
           dpAmount: _parsePrice(widget.price) * 0.3,
+          bookingId: bookingId,
         ),
       ),
     );
@@ -366,7 +433,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submit,
+                  onPressed: _isSubmitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF69B7F4),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -375,7 +442,16 @@ class _BookingFormPageState extends State<BookingFormPage> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
                     "Book",
                     style: TextStyle(
                       color: Colors.white,

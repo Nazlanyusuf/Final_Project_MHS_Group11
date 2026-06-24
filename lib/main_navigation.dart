@@ -16,11 +16,11 @@ class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   // ─── Daftar halaman ──────────────────────────────────────────────
-  final List<Widget> _pages = const [
-    DashboardPage(),   // index 0 → Home
-    WishlistPage(),    // index 1 → Wishlist
-    ActivityPage(),    // index 2 → Activity
-    ProfilePage(),     // index 3 → Profile
+  late final List<Widget> _pages = [
+    const DashboardPage(),
+    const WishlistPage(),
+    const ActivityPage(),
+    ProfilePage(onTabChange: (i) => setState(() => _selectedIndex = i)),
   ];
 
   static const _navItems = [

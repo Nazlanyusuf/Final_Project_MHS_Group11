@@ -131,4 +131,34 @@ class AuthService {
   }
 
   static Future<Map<String, String>> authHeaders() async => _authHeaders;
+
+  static Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? username,
+    String? dateOfBirth,
+  }) async {
+    try {
+      final headers = await _authHeaders;
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (username != null) body['username'] = username;
+      if (dateOfBirth != null) body['date_of_birth'] = dateOfBirth;
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/auth/profile'),
+        headers: headers,
+        body: jsonEncode(body),
+      ).timeout(const Duration(seconds: 15));
+
+      final resBody = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && resBody['success'] == true) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_data', jsonEncode(resBody['user']));
+        return {'success': true, 'user': resBody['user']};
+      }
+      return {'success': false, 'message': resBody['message'] ?? 'Gagal update profil'};
+    } catch (_) {
+      return {'success': false, 'message': 'Tidak bisa terhubung ke server'};
+    }
+  }
 }

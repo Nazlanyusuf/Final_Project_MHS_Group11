@@ -1,3 +1,4 @@
+import 'package:final_project_mhs/services/booking_service.dart';
 import 'package:flutter/material.dart';
 import 'payment_success_page.dart';
 
@@ -8,6 +9,7 @@ class PaymentPage extends StatefulWidget {
   final int guestCount;
   final double packagePrice;
   final double dpAmount;
+  final int? bookingId;
 
   const PaymentPage({
     super.key,
@@ -17,6 +19,7 @@ class PaymentPage extends StatefulWidget {
     this.guestCount = 500,
     this.packagePrice = 25000000,
     this.dpAmount = 7500000,
+    this.bookingId,
   });
 
   @override
@@ -25,6 +28,7 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   String _selectedPayment = 'visa';
+  bool _isPaying = false;
 
   final double _platformFee = 15000;
   final double _promoDiscount = 300000;
@@ -483,7 +487,7 @@ class _PaymentPageState extends State<PaymentPage> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: _onPayNow,
+                onPressed: _isPaying ? null : _onPayNow,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF69B7F4),
                   foregroundColor: Colors.white,
@@ -492,14 +496,23 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'PAY NOW',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                  ),
-                ),
+                child: _isPaying
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'PAY NOW',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -531,7 +544,17 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  void _onPayNow() {
+  Future<void> _onPayNow() async {
+    if (_isPaying) return;
+    setState(() => _isPaying = true);
+
+    if (widget.bookingId != null) {
+      await BookingService.completeBooking(widget.bookingId!);
+    }
+
+    if (!mounted) return;
+    setState(() => _isPaying = false);
+
     Navigator.push(
       context,
       MaterialPageRoute(

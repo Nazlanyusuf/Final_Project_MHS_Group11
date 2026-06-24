@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'booking_detail.dart';
 
 class BookingDetailPage extends StatelessWidget {
-  const BookingDetailPage({super.key});
+  final int venueId;
+  const BookingDetailPage({super.key, this.venueId = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -270,6 +271,7 @@ class BookingDetailPage extends StatelessWidget {
                 "D-Day Coordinator",
               ],
               downPayment: "Rp. 7.500.000",
+              venueId: venueId,
             ),
 
             _buildPackageCard(
@@ -285,6 +287,7 @@ class BookingDetailPage extends StatelessWidget {
                 "Catering for 200 people",
               ],
               downPayment: "Rp. 5.000.000",
+              venueId: venueId,
             ),
 
             const SizedBox(height: 30),
@@ -341,6 +344,7 @@ class BookingDetailPage extends StatelessWidget {
     required Color headerColor,
     required List<String> features,
     required String downPayment,
+    int venueId = 1,
   }) {
 
     return Padding(
@@ -500,6 +504,7 @@ class BookingDetailPage extends StatelessWidget {
                             builder: (_) => BookingFormPage(
                               packageName: title,
                               price: price,
+                              venueId: venueId,
                             ),
                           );
                         },
