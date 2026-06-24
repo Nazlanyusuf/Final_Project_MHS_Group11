@@ -6,12 +6,14 @@ class BookingFormPage extends StatefulWidget {
   final String packageName;
   final String price;
   final int venueId;
+  final String? imageUrl;
 
   const BookingFormPage({
     super.key,
     required this.packageName,
     required this.price,
     this.venueId = 1,
+    this.imageUrl,
   });
 
   @override
@@ -249,6 +251,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
           packagePrice: _parsePrice(widget.price),
           dpAmount: _parsePrice(widget.price) * 0.3,
           bookingId: bookingId,
+          imageUrl: widget.imageUrl,
         ),
       ),
     );

@@ -6,12 +6,16 @@ class PaymentSuccessPage extends StatefulWidget {
   final String packageName;
   final String eventName;
   final double total;
+  final String? imageUrl;
+  final String? eventDate;
 
   const PaymentSuccessPage({
     super.key,
     required this.packageName,
     required this.eventName,
     required this.total,
+    this.imageUrl,
+    this.eventDate,
   });
 
   @override
@@ -203,6 +207,98 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage>
                         ),
 
                         const SizedBox(height: 28),
+
+                        // ── Venue image card ──────────────────────────
+                        if (widget.imageUrl != null &&
+                            widget.imageUrl!.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    widget.imageUrl!,
+                                    width: double.infinity,
+                                    height: 160,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      height: 160,
+                                      color: const Color(0xFFD6EAF8),
+                                      child: const Icon(
+                                          Icons.image_not_supported,
+                                          color: Colors.white54,
+                                          size: 48),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            Color(0xCC000000),
+                                            Colors.transparent,
+                                          ],
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            widget.packageName,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          if (widget.eventDate != null &&
+                                              widget.eventDate!.isNotEmpty)
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                    Icons.calendar_today,
+                                                    size: 11,
+                                                    color: Colors.white70),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  widget.eventDate!,
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
 
                         // Detail card
                         Container(

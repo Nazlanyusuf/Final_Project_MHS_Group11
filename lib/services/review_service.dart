@@ -25,6 +25,7 @@ class ReviewService {
     required String venueName,
     required int rating,
     String? comment,
+    String? imageUrl,
   }) async {
     try {
       final reviews = await getMyReviews();
@@ -34,6 +35,7 @@ class ReviewService {
         'booking_id': bookingId,
         'venue_id':   venueId,
         'venue_name': venueName,
+        'image_url':  imageUrl ?? '',
         'rating':     rating,
         'comment':    comment ?? '',
         'created_at': DateTime.now().toIso8601String(),

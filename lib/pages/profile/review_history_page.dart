@@ -110,13 +110,13 @@ class _ReviewHistoryPageState extends State<ReviewHistoryPage> {
 
   Widget _buildCard(Map<String, dynamic> r) {
     final venueName = r['venue_name'] as String? ?? '-';
+    final imageUrl  = r['image_url'] as String? ?? '';
     final rating    = r['rating'] as int? ?? 0;
     final comment   = r['comment'] as String? ?? '';
     final date      = _formatDate(r['created_at'] as String?);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -131,6 +131,33 @@ class _ReviewHistoryPageState extends State<ReviewHistoryPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Venue image ────────────────────────────────────
+          if (imageUrl.isNotEmpty)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              child: Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: 150,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(18)),
+                  ),
+                  child: const Icon(Icons.image_not_supported,
+                      color: Colors.grey, size: 40),
+                ),
+              ),
+            ),
+
+          Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           // ── Venue name + date ──────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,6 +223,9 @@ class _ReviewHistoryPageState extends State<ReviewHistoryPage> {
               ),
             ),
           ],
+            ],
+          ),
+          ),
         ],
       ),
     );

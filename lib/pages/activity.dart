@@ -130,7 +130,8 @@ class _ActivityPageState extends State<ActivityPage>
   }
 
   Future<void> _showReviewSheet(
-      BuildContext context, int bookingId, int venueId, String venueName) async {
+      BuildContext context, int bookingId, int venueId, String venueName,
+      String imageUrl) async {
     final submitted = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -139,6 +140,7 @@ class _ActivityPageState extends State<ActivityPage>
         bookingId: bookingId,
         venueId: venueId,
         venueName: venueName,
+        imageUrl: imageUrl,
       ),
     );
     if (submitted == true && mounted) {
@@ -455,7 +457,7 @@ class _ActivityPageState extends State<ActivityPage>
                                 height: 28,
                                 child: ElevatedButton(
                                   onPressed: () => _showReviewSheet(
-                                      context, bookingId, venueId, venueName),
+                                      context, bookingId, venueId, venueName, imageUrl),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: _blue,
                                     foregroundColor: Colors.white,
@@ -544,6 +546,7 @@ class _ActivityPageState extends State<ActivityPage>
                               packagePrice: packagePrice,
                               dpAmount: packagePrice * 0.3,
                               bookingId: bookingId,
+                              imageUrl: imageUrl,
                             ),
                           ),
                         ),
@@ -579,11 +582,13 @@ class _ReviewSheet extends StatefulWidget {
   final int bookingId;
   final int venueId;
   final String venueName;
+  final String imageUrl;
 
   const _ReviewSheet({
     required this.bookingId,
     required this.venueId,
     required this.venueName,
+    required this.imageUrl,
   });
 
   @override
@@ -628,6 +633,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
       bookingId:  widget.bookingId,
       venueId:    widget.venueId,
       venueName:  widget.venueName,
+      imageUrl:   widget.imageUrl,
       rating:     _rating,
       comment:    _commentCtrl.text.trim(),
     );
@@ -670,6 +676,28 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               ),
             ),
           ),
+
+          // ── Venue image card ─────────────────────────────────────
+          if (widget.imageUrl.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                widget.imageUrl,
+                width: double.infinity,
+                height: 140,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.image_not_supported,
+                      color: Colors.grey, size: 40),
+                ),
+              ),
+            ),
+          if (widget.imageUrl.isNotEmpty) const SizedBox(height: 14),
 
           const Text(
             'Tulis Review',

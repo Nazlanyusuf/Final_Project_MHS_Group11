@@ -458,6 +458,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                             packageName: title,
                             price: price,
                             venueId: widget.venueId,
+                            imageUrl: _imageUrl,
                           ),
                         ),
                         child: Container(

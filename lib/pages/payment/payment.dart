@@ -10,6 +10,7 @@ class PaymentPage extends StatefulWidget {
   final double packagePrice;
   final double dpAmount;
   final int? bookingId;
+  final String? imageUrl;
 
   const PaymentPage({
     super.key,
@@ -20,6 +21,7 @@ class PaymentPage extends StatefulWidget {
     this.packagePrice = 25000000,
     this.dpAmount = 7500000,
     this.bookingId,
+    this.imageUrl,
   });
 
   @override
@@ -212,19 +214,33 @@ class _PaymentPageState extends State<PaymentPage> {
           // Thumbnail
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://images.unsplash.com/photo-1519741497674-611481863552?w=200',
+            child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
+                ? Image.network(
+                    widget.imageUrl!,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 64,
+                      height: 64,
+                      color: const Color(0xFFD6EAF8),
+                      child: const Icon(Icons.image_not_supported,
+                          color: Colors.white54),
+                    ),
+                  )
+                : Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: const DecorationImage(
+                        image: NetworkImage(
+                          'https://images.unsplash.com/photo-1519741497674-611481863552?w=200',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -562,6 +578,8 @@ class _PaymentPageState extends State<PaymentPage> {
           packageName: widget.packageName,
           eventName: widget.eventName,
           total: _total,
+          imageUrl: widget.imageUrl,
+          eventDate: widget.eventDate,
         ),
       ),
     );
