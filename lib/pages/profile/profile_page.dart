@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../auth/login_page.dart';
+import '../reminders/event_reminders_page.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
 import 'personal_info_page.dart';
 
@@ -161,17 +162,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 context,
                 Icons.notifications_none_outlined,
                 'Event Reminders',
-                onTap: () {},
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const EventRemindersPage()),
+                ),
               ),
-
-              const SizedBox(height: 18),
-
-              // ── General section ───────────────────────────────────
-              _sectionHeader('General'),
-              _menuItem(context, Icons.help_outline, 'Help Center',
-                  onTap: () {}),
-              _menuItem(context, Icons.settings_outlined, 'Settings',
-                  onTap: () {}),
 
               const SizedBox(height: 28),
 
