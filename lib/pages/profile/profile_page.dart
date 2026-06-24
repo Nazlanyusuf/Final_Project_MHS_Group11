@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../auth/login_page.dart';
 import '../reminders/event_reminders_page.dart';
+import 'package:final_project_mhs/widgets/guest_view.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
 import 'personal_info_page.dart';
 
@@ -241,60 +242,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildGuestView() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: _blue.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.person_outline,
-                  size: 64, color: _blue),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Anda Belum Login',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Login untuk mengakses profil, riwayat booking, dan fitur lainnya.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.black45, height: 1.5),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (_) => false,
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
-                ),
-                child: const Text('Login Sekarang',
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w600)),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const GuestView(
+      icon: Icons.person_outline,
+      message:
+          'Login untuk mengakses profil, riwayat booking, dan fitur lainnya.',
     );
   }
 

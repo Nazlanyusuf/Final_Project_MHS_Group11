@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:final_project_mhs/services/notification_service.dart';
 
 class EventRemindersPage extends StatefulWidget {
   const EventRemindersPage({super.key});
@@ -33,6 +34,10 @@ class _EventRemindersPageState extends State<EventRemindersPage> {
         }
         _isLoading = false;
       });
+      // Reschedule upcoming notifications in case app restarted
+      for (final r in _reminders) {
+        _scheduleNotification(r);
+      }
     }
   }
 
@@ -44,11 +49,45 @@ class _EventRemindersPageState extends State<EventRemindersPage> {
   void _add(Map<String, dynamic> reminder) {
     setState(() => _reminders.add(reminder));
     _save();
+    _scheduleNotification(reminder);
   }
 
   void _delete(String id) {
+    NotificationService.cancelReminder(id);
     setState(() => _reminders.removeWhere((r) => r['id'] == id));
     _save();
+  }
+
+  Future<void> _scheduleNotification(Map<String, dynamic> r) async {
+    final dateStr = r['date'] as String? ?? '';
+    final timeStr = r['time'] as String? ?? '00:00';
+    final title = r['title'] as String? ?? 'Event Reminder';
+    final id = r['id'] as String? ?? '';
+    final note = r['note'] as String? ?? '';
+
+    if (dateStr.isEmpty || id.isEmpty) return;
+
+    final dateParts = dateStr.split('-');
+    if (dateParts.length != 3) return;
+
+    final timeParts = timeStr.split(':');
+    final hour = int.tryParse(timeParts.isNotEmpty ? timeParts[0] : '0') ?? 0;
+    final minute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
+
+    final scheduledTime = DateTime(
+      int.parse(dateParts[0]),
+      int.parse(dateParts[1]),
+      int.parse(dateParts[2]),
+      hour,
+      minute,
+    );
+
+    await NotificationService.scheduleReminder(
+      id: id,
+      title: title,
+      scheduledTime: scheduledTime,
+      body: note.isNotEmpty ? note : null,
+    );
   }
 
   void _showAddSheet() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/services/venue_service.dart';
 import 'package:final_project_mhs/services/wishlist_service.dart';
 
 class VenuePickerPage extends StatefulWidget {
@@ -11,20 +12,7 @@ class VenuePickerPage extends StatefulWidget {
 class _VenuePickerPageState extends State<VenuePickerPage> {
   static const _blue = Color(0xFF6DB6E3);
 
-  static const List<Map<String, dynamic>> _allVenues = [
-    {"id": 1, "title": "Le Blanc Wedding Organizer", "category": "Wedding", "location": "BSD", "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=400&auto=format&fit=crop"},
-    {"id": 2, "title": "Elegant Wedding Organizer", "category": "Wedding", "location": "Jakarta Selatan", "image": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=400&auto=format&fit=crop"},
-    {"id": 3, "title": "Amanjiwo Exclusive Wedding", "category": "Wedding", "location": "Jawa Tengah", "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=400&auto=format&fit=crop"},
-    {"id": 4, "title": "Party Planner Birthday Organizer", "category": "Birthday", "location": "JabaDeTaBek", "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=400&auto=format&fit=crop"},
-    {"id": 5, "title": "Happy Moment Birthday Crew", "category": "Birthday", "location": "Tangerang", "image": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=400&auto=format&fit=crop"},
-    {"id": 6, "title": "Groovy Event Organizer", "category": "Concert", "location": "ICE BSD", "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400&auto=format&fit=crop"},
-    {"id": 7, "title": "Soundwave Concert Production", "category": "Concert", "location": "Jakarta Utara", "image": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=400&auto=format&fit=crop"},
-    {"id": 8, "title": "BizTalk Seminar Organizer", "category": "Seminar", "location": "SCBD Jakarta", "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop"},
-    {"id": 9, "title": "ProConference Planner", "category": "Seminar", "location": "Serpong", "image": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=400&auto=format&fit=crop"},
-    {"id": 10, "title": "SnapShot Studio", "category": "Photoshoot", "location": "Kemang, Jakarta", "image": "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=400&auto=format&fit=crop"},
-    {"id": 11, "title": "LensArt Photography", "category": "Photoshoot", "location": "Bintaro", "image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=400&auto=format&fit=crop"},
-  ];
-
+  List<Map<String, dynamic>> _allVenues = [];
   Set<int> _wishlistedIds = {};
   bool _isLoading = true;
   String _selectedCategory = 'Semua';
@@ -36,15 +24,18 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
   @override
   void initState() {
     super.initState();
-    _loadWishlist();
+    _loadData();
   }
 
-  Future<void> _loadWishlist() async {
+  Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final data = await WishlistService.getWishlist();
+    final venues = await VenueService.getVenues();
+    final wishlistData = await WishlistService.getWishlist();
     if (mounted) {
       setState(() {
-        _wishlistedIds = data.map((e) => e['id'] as int? ?? 0).toSet();
+        _allVenues = venues;
+        _wishlistedIds =
+            wishlistData.map((e) => e['id'] as int? ?? 0).toSet();
         _isLoading = false;
       });
     }
@@ -69,6 +60,17 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
         .toList();
   }
 
+  Color _catColor(String cat) {
+    switch (cat.toLowerCase()) {
+      case 'wedding':    return Colors.pink;
+      case 'birthday':   return Colors.orange;
+      case 'concert':    return Colors.purple;
+      case 'seminar':    return Colors.blue;
+      case 'photoshoot': return Colors.teal;
+      default:           return _blue;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +81,7 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
               size: 18, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, true),
         ),
         title: const Text(
           'Tambah ke Wishlist',
@@ -103,7 +105,7 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
                 scrollDirection: Axis.horizontal,
                 itemCount: _categories.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (ctx, i) {
+                itemBuilder: (_, i) {
                   final cat = _categories[i];
                   final sel = _selectedCategory == cat;
                   return GestureDetector(
@@ -157,7 +159,7 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         itemCount: _filtered.length,
-                        itemBuilder: (ctx, i) =>
+                        itemBuilder: (_, i) =>
                             _buildItem(_filtered[i]),
                       ),
           ),
@@ -191,28 +193,12 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
   }
 
   Widget _buildItem(Map<String, dynamic> venue) {
-    final id = venue['id'] as int;
+    final id = venue['id'] as int? ?? 0;
+    final category = venue['category'] as String? ?? '';
     final isWishlisted = _wishlistedIds.contains(id);
-    final Color catColor;
-    switch ((venue['category'] as String).toLowerCase()) {
-      case 'wedding':
-        catColor = Colors.pink;
-        break;
-      case 'birthday':
-        catColor = Colors.orange;
-        break;
-      case 'concert':
-        catColor = Colors.purple;
-        break;
-      case 'seminar':
-        catColor = Colors.blue;
-        break;
-      case 'photoshoot':
-        catColor = Colors.teal;
-        break;
-      default:
-        catColor = _blue;
-    }
+    final catColor = _catColor(category);
+    final imageUrl =
+        (venue['image_url'] ?? venue['image']) as String? ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -220,8 +206,9 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color:
-              isWishlisted ? _blue.withOpacity(0.5) : Colors.transparent,
+          color: isWishlisted
+              ? _blue.withOpacity(0.5)
+              : Colors.transparent,
           width: 1.5,
         ),
         boxShadow: [
@@ -238,7 +225,7 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Image.network(
-            venue['image'] as String,
+            imageUrl,
             width: 56,
             height: 56,
             fit: BoxFit.cover,
@@ -252,9 +239,9 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
           ),
         ),
         title: Text(
-          venue['title'] as String,
-          style:
-              const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          venue['title'] as String? ?? '-',
+          style: const TextStyle(
+              fontSize: 13, fontWeight: FontWeight.w600),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -262,14 +249,14 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
           children: [
             Container(
               margin: const EdgeInsets.only(top: 4),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
                 color: catColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                venue['category'] as String,
+                category,
                 style: TextStyle(
                     fontSize: 10,
                     color: catColor,
@@ -279,7 +266,7 @@ class _VenuePickerPageState extends State<VenuePickerPage> {
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                venue['location'] as String,
+                venue['location'] as String? ?? '-',
                 style: const TextStyle(
                     fontSize: 11, color: Colors.black45),
                 overflow: TextOverflow.ellipsis,

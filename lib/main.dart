@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'main_navigation.dart';
 import 'pages/auth/login_page.dart';
 import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 import 'utils/smooth_transitions.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.initialize();
   runApp(const PlanIt());
 }
 

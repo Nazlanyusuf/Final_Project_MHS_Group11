@@ -1,24 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_mhs/services/venue_service.dart';
 import 'booking_detail.dart';
 
-class BookingDetailPage extends StatelessWidget {
+class BookingDetailPage extends StatefulWidget {
   final int venueId;
   const BookingDetailPage({super.key, this.venueId = 1});
 
   @override
+  State<BookingDetailPage> createState() => _BookingDetailPageState();
+}
+
+class _BookingDetailPageState extends State<BookingDetailPage> {
+  static const _blue = Color(0xFF6DB6E3);
+
+  Map<String, dynamic>? _venue;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVenue();
+  }
+
+  Future<void> _loadVenue() async {
+    final data = await VenueService.getVenue(widget.venueId);
+    if (mounted) {
+      setState(() {
+        _venue = data;
+        _isLoading = false;
+      });
+    }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────
+  String get _title =>
+      _venue?['title'] as String? ?? 'Event Organizer';
+  String get _category =>
+      _venue?['category'] as String? ?? 'Wedding';
+  String get _imageUrl =>
+      (_venue?['image_url'] ?? _venue?['image']) as String? ??
+      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop';
+  String get _rating =>
+      (_venue?['rating'] ?? '4.9').toString();
+  String get _reviewCount =>
+      (_venue?['review'] ?? _venue?['review_count'] ?? '0').toString();
+  String get _price =>
+      _venue?['price'] as String? ?? 'Rp 8.000.000';
+
+  Color get _categoryColor {
+    switch (_category.toLowerCase()) {
+      case 'wedding':    return Colors.pink;
+      case 'birthday':   return Colors.orange;
+      case 'concert':    return Colors.purple;
+      case 'seminar':    return Colors.blue;
+      case 'photoshoot': return Colors.teal;
+      default:           return _blue;
+    }
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF4F4F4),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new,
+                color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: const Center(
+            child: CircularProgressIndicator(color: _blue)),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F4),
-
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-
-            /// HEADER IMAGE
+            // ── Header image ─────────────────────────────────────
             Stack(
               children: [
-
                 Container(
                   height: 260,
                   width: double.infinity,
@@ -27,10 +95,8 @@ class BookingDetailPage extends StatelessWidget {
                       bottomLeft: Radius.circular(24),
                       bottomRight: Radius.circular(24),
                     ),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop",
-                      ),
+                    image: DecorationImage(
+                      image: NetworkImage(_imageUrl),
                       fit: BoxFit.cover,
                     ),
                     boxShadow: [
@@ -42,7 +108,7 @@ class BookingDetailPage extends StatelessWidget {
                     ],
                   ),
                 ),
-
+                // Gradient overlay
                 Container(
                   height: 260,
                   decoration: BoxDecoration(
@@ -60,28 +126,24 @@ class BookingDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-
+                // Back button
                 Positioned(
                   top: 50,
                   left: 20,
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
+                    onTap: () => Navigator.pop(context),
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.3),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.white,
-                      ),
+                      child: const Icon(Icons.arrow_back_ios_new,
+                          color: Colors.white),
                     ),
                   ),
                 ),
-
+                // Venue info overlay
                 Positioned(
                   bottom: 24,
                   left: 20,
@@ -89,66 +151,50 @@ class BookingDetailPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      const Text(
-                        "Le Blanc Wedding\nOrganizer",
-                        style: TextStyle(
+                      Text(
+                        _title,
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          height: 1.1,
+                          height: 1.2,
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
                       Row(
                         children: [
-
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.pink,
-                              borderRadius:
-                                  BorderRadius.circular(20),
+                              color: _categoryColor,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
-                              "Wedding",
-                              style: TextStyle(
+                            child: Text(
+                              _category,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 10),
-
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                  size: 18,
-                                ),
-                                SizedBox(width: 4),
+                                const Icon(Icons.star,
+                                    color: Colors.amber, size: 18),
+                                const SizedBox(width: 4),
                                 Text(
-                                  "4.9",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  _rating,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -163,7 +209,7 @@ class BookingDetailPage extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            /// REVIEW CARD
+            // ── Review card ───────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
@@ -180,58 +226,43 @@ class BookingDetailPage extends StatelessWidget {
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Row(
                       children: [
-
-                        const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-
+                        const Icon(Icons.star, color: Colors.amber),
                         const SizedBox(width: 6),
-
                         RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
-                                text: "4.9",
-                                style: TextStyle(
+                                text: _rating,
+                                style: const TextStyle(
                                   color: Colors.blue,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 22,
                                 ),
                               ),
-                              TextSpan(
-                                text: " / 5",
+                              const TextSpan(
+                                text: ' / 5',
                                 style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 18,
-                                ),
+                                    color: Colors.black87,
+                                    fontSize: 18),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 6),
-
-                    const Text(
-                      "Based on 97 reviews",
-                      style: TextStyle(
-                        color: Colors.black54,
-                      ),
+                    Text(
+                      'Based on $_reviewCount reviews',
+                      style: const TextStyle(color: Colors.black54),
                     ),
-
                     const SizedBox(height: 14),
-
-                    _buildRatingBar(5, 0.80),
+                    _buildRatingBar(5, 0.75),
                     _buildRatingBar(4, 0.15),
-                    _buildRatingBar(3, 0.05),
+                    _buildRatingBar(3, 0.10),
                   ],
                 ),
               ),
@@ -239,55 +270,48 @@ class BookingDetailPage extends StatelessWidget {
 
             const SizedBox(height: 22),
 
-            /// PACKAGE TITLE
+            // ── Packages ──────────────────────────────────────────
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 18),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Packages For You",
+                  'Packages For You',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
 
             const SizedBox(height: 14),
 
-            /// PACKAGE CARD
             _buildPackageCard(
               context,
-              title: "Platinum",
-              subtitle: "Best for intimate weddings",
-              price: "Rp. 25.000.000",
+              title: 'Platinum',
+              subtitle: 'Best for intimate events',
+              price: _price,
               headerColor: const Color(0xFFC8D0F0),
               features: [
-                "Luxurious full-set decoration",
-                "MC + band + entertainment",
-                "Photography + cinematic video",
-                "Catering for 500 people",
-                "D-Day Coordinator",
+                'Luxurious full-set decoration',
+                'MC + band + entertainment',
+                'Photography + cinematic video',
+                'Catering for 500 guests',
+                'D-Day Coordinator',
               ],
-              downPayment: "Rp. 7.500.000",
-              venueId: venueId,
             ),
 
             _buildPackageCard(
               context,
-              title: "Gold",
-              subtitle: "Popular package",
-              price: "Rp. 18.000.000",
+              title: 'Gold',
+              subtitle: 'Popular package',
+              price: _price,
               headerColor: const Color(0xFFC6B93D),
               features: [
-                "Premium decoration",
-                "MC + live entertainment",
-                "Photographer + Videographer",
-                "Catering for 200 people",
+                'Premium decoration',
+                'MC + live entertainment',
+                'Photographer + Videographer',
+                'Catering for 200 guests',
               ],
-              downPayment: "Rp. 5.000.000",
-              venueId: venueId,
             ),
 
             const SizedBox(height: 30),
@@ -298,21 +322,13 @@ class BookingDetailPage extends StatelessWidget {
   }
 
   Widget _buildRatingBar(int star, double value) {
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-
-          Text(
-            "$star ⭐",
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
+          Text('$star ⭐',
+              style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(width: 10),
-
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
@@ -321,16 +337,12 @@ class BookingDetailPage extends StatelessWidget {
                 minHeight: 8,
                 backgroundColor: Colors.grey.shade300,
                 valueColor:
-                    const AlwaysStoppedAnimation(
-                  Colors.blue,
-                ),
+                    const AlwaysStoppedAnimation(Colors.blue),
               ),
             ),
           ),
-
           const SizedBox(width: 10),
-
-          Text("${(value * 100).toInt()}%"),
+          Text('${(value * 100).toInt()}%'),
         ],
       ),
     );
@@ -343,15 +355,9 @@ class BookingDetailPage extends StatelessWidget {
     required String price,
     required Color headerColor,
     required List<String> features,
-    required String downPayment,
-    int venueId = 1,
   }) {
-
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 10,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -366,8 +372,7 @@ class BookingDetailPage extends StatelessWidget {
         ),
         child: Column(
           children: [
-
-            /// HEADER
+            // Package header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -378,161 +383,95 @@ class BookingDetailPage extends StatelessWidget {
                 ),
               ),
               child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          color: Colors.black54,
-                        ),
-                      ),
+                      Text(title,
+                          style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold)),
+                      Text(subtitle,
+                          style: const TextStyle(
+                              color: Colors.black54)),
                     ],
                   ),
-
                   Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-
-                      const Text(
-                        "Start from",
-                        style: TextStyle(
-                          color: Colors.black54,
-                        ),
-                      ),
-
-                      Text(
-                        price,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      const Text('Start from',
+                          style: TextStyle(color: Colors.black54)),
+                      Text(price,
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ],
               ),
             ),
-
-            /// BODY
+            // Package body
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-
                   ...features.map(
-                    (feature) => Padding(
-                      padding:
-                          const EdgeInsets.only(
-                        bottom: 10,
-                      ),
+                    (f) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         children: [
-
-                          const Icon(
-                            Icons.check_circle,
-                            color: Colors.teal,
-                            size: 20,
-                          ),
-
+                          const Icon(Icons.check_circle,
+                              color: Colors.teal, size: 20),
                           const SizedBox(width: 10),
-
                           Expanded(
-                            child: Text(
-                              feature,
-                              style:
-                                  const TextStyle(
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
+                              child: Text(f,
+                                  style:
+                                      const TextStyle(fontSize: 15))),
                         ],
                       ),
                     ),
                   ),
-
                   const Divider(height: 30),
-
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
-                          const Text(
-                            "DP starts from",
-                            style: TextStyle(
-                              color: Colors.black54,
-                            ),
-                          ),
-
+                          const Text('DP starts from',
+                              style:
+                                  TextStyle(color: Colors.black54)),
                           Text(
-                            downPayment,
+                            'Rp ${_dpAmount(price)}',
                             style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-
                       GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            barrierColor: Colors.black54,
-                            builder: (_) => BookingFormPage(
-                              packageName: title,
-                              price: price,
-                              venueId: venueId,
-                            ),
-                          );
-                        },
-                        child: AnimatedContainer(
-                          duration:
-                              const Duration(
-                            milliseconds: 250,
+                        onTap: () => showDialog(
+                          context: context,
+                          barrierColor: Colors.black54,
+                          builder: (_) => BookingFormPage(
+                            packageName: title,
+                            price: price,
+                            venueId: widget.venueId,
                           ),
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 14,
-                          ),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 28, vertical: 14),
                           decoration: BoxDecoration(
-                            color:
-                                const Color(0xFF6DB8F7),
-                            borderRadius:
-                                BorderRadius.circular(
-                              16,
-                            ),
+                            color: _blue,
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: const Text(
-                            "Choose",
+                            'Choose',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -545,5 +484,18 @@ class BookingDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Parse price string and calculate 30% DP
+  String _dpAmount(String priceStr) {
+    final digits = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
+    final amount = int.tryParse(digits) ?? 0;
+    final dp = (amount * 0.3).toInt();
+    // Format with dots
+    final formatted = dp.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+    return formatted;
   }
 }
