@@ -5,7 +5,9 @@ import 'package:final_project_mhs/widgets/guest_view.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
 import 'package:final_project_mhs/services/booking_service.dart';
 import 'package:final_project_mhs/services/wishlist_service.dart';
+import 'package:final_project_mhs/services/review_service.dart';
 import 'personal_info_page.dart';
+import 'review_history_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final void Function(int)? onTabChange;
@@ -40,18 +42,20 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() { _isLoggedIn = false; _isLoading = false; });
       return;
     }
-    final userFuture      = AuthService.getUser();
-    final bookingFuture   = BookingService.getBookings();
-    final wishlistFuture  = WishlistService.getWishlist();
-    final user      = await userFuture;
-    final bookings  = await bookingFuture;
-    final wishlist  = await wishlistFuture;
+    final userF     = AuthService.getUser();
+    final bookingF  = BookingService.getBookings();
+    final wishlistF = WishlistService.getWishlist();
+    final reviewF   = ReviewService.getMyReviews();
+    final user      = await userF;
+    final bookings  = await bookingF;
+    final wishlist  = await wishlistF;
+    final reviews   = await reviewF;
     if (mounted) {
       setState(() {
         _user          = user;
         _bookingCount  = bookings.length;
         _wishlistCount = wishlist.length;
-        _reviewCount   = 0;
+        _reviewCount   = reviews.length;
         _isLoggedIn    = true;
         _isLoading     = false;
       });
@@ -66,12 +70,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _reloadStats() async {
     final bookingF  = BookingService.getBookings();
     final wishlistF = WishlistService.getWishlist();
+    final reviewF   = ReviewService.getMyReviews();
     final bookings  = await bookingF;
     final wishlist  = await wishlistF;
+    final reviews   = await reviewF;
     if (mounted) {
       setState(() {
         _bookingCount  = bookings.length;
         _wishlistCount = wishlist.length;
+        _reviewCount   = reviews.length;
       });
     }
   }
@@ -212,6 +219,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           icon: Icons.star_border_outlined,
                           value: _reviewCount.toString(),
                           label: 'Reviews',
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ReviewHistoryPage()),
+                            );
+                            _reloadStats();
+                          },
                         ),
                       ),
                     ],
