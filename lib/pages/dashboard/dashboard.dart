@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:final_project_mhs/services/venue_service.dart';
 import 'package:final_project_mhs/services/wishlist_service.dart';
 import 'package:final_project_mhs/services/auth_service.dart';
@@ -16,11 +18,13 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with WidgetsBindingObserver {
   String _selectedCategory = 'All\nProducts';
   List<Map<String, dynamic>> _venues = [];
   Set<int> _wishlistedIds = {};
   bool _isVenueLoading = true;
+  bool _hasUpcomingReminders = false;
 
   final List<Map<String, dynamic>> categories = [
     {"title": "Wedding",       "icon": Icons.favorite,   "color": Colors.pink},
@@ -34,8 +38,23 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadVenues();
     _loadWishlistIds();
+    _checkUpcomingReminders();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkUpcomingReminders();
+    }
   }
 
   Future<void> _loadVenues() async {
@@ -61,6 +80,24 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _checkUpcomingReminders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('event_reminders');
+    if (raw == null) {
+      if (mounted) setState(() => _hasUpcomingReminders = false);
+      return;
+    }
+    final list =
+        List<Map<String, dynamic>>.from(jsonDecode(raw) as List);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final hasAny = list.any((r) {
+      final d = DateTime.tryParse(r['date'] as String? ?? '');
+      return d != null && !d.isBefore(today);
+    });
+    if (mounted) setState(() => _hasUpcomingReminders = hasAny);
+  }
+
   Future<void> _toggleWishlist(int venueId) async {
     final ok = await AuthGuard.check(context);
     if (!ok) return;
@@ -84,6 +121,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onRefresh: () async {
             await _loadVenues();
             await _loadWishlistIds();
+            await _checkUpcomingReminders();
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -92,9 +130,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 _buildHeader(),
                 const SizedBox(height: 18),
                 _buildPromoBanner(),
-                const SizedBox(height: 14),
-                _buildSdgBanner(),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
                 _buildSectionTitle(),
                 const SizedBox(height: 14),
                 _buildVenueList(),
@@ -197,12 +233,38 @@ class _DashboardPageState extends State<DashboardPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // ── Bell icon with badge ──────────────────────────
               GestureDetector(
-                onTap: () => Navigator.push(context,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
                     MaterialPageRoute(
-                        builder: (_) => const NotificationPage())),
-                child: const Icon(Icons.notifications_none_outlined,
-                    size: 28, color: Colors.white),
+                        builder: (_) => const NotificationPage()),
+                  );
+                  _checkUpcomingReminders();
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(Icons.notifications_none_outlined,
+                        size: 28, color: Colors.white),
+                    if (_hasUpcomingReminders)
+                      Positioned(
+                        top: -1,
+                        right: -1,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: const Color(0xFF6DB6E3), width: 1.5),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               GestureDetector(
                 onTap: () => Navigator.push(context,
@@ -368,65 +430,6 @@ class _DashboardPageState extends State<DashboardPage> {
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── SDG Banner ───────────────────────────────────────────────────
-  Widget _buildSdgBanner() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8F5E9),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('SDG\n 8',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        height: 1.2)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Decent Work & Economic Growth',
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2E7D32)),
-                  ),
-                  SizedBox(height: 3),
-                  Text(
-                    'PlanIt mendukung EO lokal tumbuh secara digital dan menciptakan lapangan kerja.',
-                    style: TextStyle(
-                        fontSize: 10,
-                        color: Color(0xFF388E3C),
-                        height: 1.4),
-                  ),
                 ],
               ),
             ),

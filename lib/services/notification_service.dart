@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -9,6 +9,8 @@ class NotificationService {
 
   static Future<void> initialize() async {
     if (_initialized) return;
+    if (kIsWeb) return; // flutter_local_notifications tidak support web
+
     tz_data.initializeTimeZones();
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -17,7 +19,7 @@ class NotificationService {
       const InitializationSettings(android: android, iOS: ios),
     );
 
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       final impl = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       await impl?.requestNotificationsPermission();
@@ -35,6 +37,7 @@ class NotificationService {
     required DateTime scheduledTime,
     String? body,
   }) async {
+    if (kIsWeb) return;
     if (scheduledTime.isBefore(DateTime.now())) return;
     await initialize();
 
@@ -64,6 +67,7 @@ class NotificationService {
   }
 
   static Future<void> cancelReminder(String id) async {
+    if (kIsWeb) return;
     await _plugin.cancel(_toId(id));
   }
 }
