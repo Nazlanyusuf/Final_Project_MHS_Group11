@@ -97,7 +97,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 // Email
                 _inputField(
                   controller: _emailController,
-                  hint: 'Username/Email',
+                  hint: 'Email',
                   keyboardType: TextInputType.emailAddress,
                 ),
 
