@@ -16,7 +16,22 @@ class BookingService {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
-        return List<Map<String, dynamic>>.from(body['data'] as List);
+        final data = body['data'] as List;
+        if (data.isNotEmpty) {
+          final first = data.first as Map<String, dynamic>;
+          // Debug struktur booking response
+          // ignore: avoid_print
+          print('BOOKING SAMPLE KEYS (first): ${first.keys.toList()}');
+          // ignore: avoid_print
+          print('VENUE SAMPLE (completed): ${first['venue']}');
+          // ignore: avoid_print
+          // Debug: tampilkan kemungkinan field image yang flat
+          // ignore: avoid_print
+          print('VENUE IMAGE_URL (completed): ${first['image_url'] ?? first['imageUrl'] ?? first['image']}');
+          // ignore: avoid_print
+          print('VENUE_TITLE (completed): ${first['venue_title']}');
+        }
+        return List<Map<String, dynamic>>.from(data);
       }
     } catch (_) {}
     return [];

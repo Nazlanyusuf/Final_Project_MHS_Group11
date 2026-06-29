@@ -20,8 +20,11 @@ class VenueCard extends StatelessWidget {
   // ── Field helpers ──────────────────────────────────────────────
   String get _title => venue['title'] as String? ?? '-';
   String get _category => venue['category'] as String? ?? '';
+
+  /// Support both common API keys.
   String get _imageUrl =>
-      (venue['image_url'] ?? venue['image']) as String? ?? '';
+      (venue['image_url'] ?? venue['imageUrl'] ?? venue['image']) as String? ?? '';
+
   String get _location => venue['location'] as String? ?? '-';
   String get _price => venue['price'] as String? ?? '-';
   String get _rating => (venue['rating'] ?? '0').toString();
@@ -30,12 +33,18 @@ class VenueCard extends StatelessWidget {
 
   Color get _categoryColor {
     switch (_category.toLowerCase()) {
-      case 'wedding':    return Colors.pink;
-      case 'birthday':   return Colors.orange;
-      case 'concert':    return Colors.purple;
-      case 'seminar':    return Colors.blue;
-      case 'photoshoot': return Colors.teal;
-      default:           return const Color(0xFF6DB6E3);
+      case 'wedding':
+        return Colors.pink;
+      case 'birthday':
+        return Colors.orange;
+      case 'concert':
+        return Colors.purple;
+      case 'seminar':
+        return Colors.blue;
+      case 'photoshoot':
+        return Colors.teal;
+      default:
+        return const Color(0xFF6DB6E3);
     }
   }
 
@@ -64,19 +73,27 @@ class VenueCard extends StatelessWidget {
                 topLeft: Radius.circular(18),
                 bottomLeft: Radius.circular(18),
               ),
-              child: Image.network(
-                _imageUrl,
-                width: 110,
-                height: 110,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 110,
-                  height: 110,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image_not_supported,
-                      color: Colors.grey),
-                ),
-              ),
+              child: _imageUrl.isEmpty
+                  ? Container(
+                      width: 110,
+                      height: 110,
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.image_not_supported,
+                          color: Colors.grey),
+                    )
+                  : Image.network(
+                      _imageUrl,
+                      width: 110,
+                      height: 110,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 110,
+                        height: 110,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported,
+                            color: Colors.grey),
+                      ),
+                    ),
             ),
             // Info
             Expanded(
@@ -93,8 +110,7 @@ class VenueCard extends StatelessWidget {
                           child: Text(
                             _title,
                             style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700),
+                                fontSize: 14, fontWeight: FontWeight.w700),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -118,6 +134,7 @@ class VenueCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
+
                     // Category badge (optional)
                     if (showCategoryBadge) ...[
                       Container(
@@ -137,14 +154,14 @@ class VenueCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                     ],
+
                     // Rating + reviews
                     Row(
                       children: [
                         const Icon(Icons.star,
                             color: Colors.amber, size: 15),
                         const SizedBox(width: 3),
-                        Text(_rating,
-                            style: const TextStyle(fontSize: 12)),
+                        Text(_rating, style: const TextStyle(fontSize: 12)),
                         const SizedBox(width: 8),
                         const Icon(Icons.chat_bubble_outline,
                             size: 13, color: Colors.grey),
@@ -154,6 +171,7 @@ class VenueCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 5),
+
                     // Location
                     Row(
                       children: [
@@ -164,14 +182,14 @@ class VenueCard extends StatelessWidget {
                           child: Text(
                             _location,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12),
+                                fontWeight: FontWeight.w600, fontSize: 12),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
+
                     // Price
                     Align(
                       alignment: Alignment.bottomRight,
@@ -183,8 +201,7 @@ class VenueCard extends StatelessWidget {
                                   fontSize: 10, color: Colors.grey)),
                           Text(_price,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13)),
+                                  fontWeight: FontWeight.bold, fontSize: 13)),
                         ],
                       ),
                     ),
@@ -198,3 +215,4 @@ class VenueCard extends StatelessWidget {
     );
   }
 }
+

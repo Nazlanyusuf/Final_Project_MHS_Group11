@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                 // Username/Email
                 _field(
                   controller: _emailCtrl,
-                  hint: 'Username/Email',
+                  hint: 'Email',
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 12),

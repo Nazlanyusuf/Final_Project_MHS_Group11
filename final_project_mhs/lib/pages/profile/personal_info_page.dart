@@ -38,13 +38,16 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     final dob = u['date_of_birth'] as String?;
     if (dob != null && dob.isNotEmpty) {
       try {
-        final parts = dob.split('-');
+        // API kadang kirim "YYYY-MM-DD" atau "YYYY-MM-DDTHH:mm:ss...Z"
+        final datePart = dob.split('T').first;
+        final parts = datePart.split('-');
         if (parts.length == 3) {
           _dobCtrl.text = '${parts[2]}/${parts[1]}/${parts[0]}';
+          return;
         }
-      } catch (_) {
-        _dobCtrl.text = dob;
-      }
+      } catch (_) {}
+      // fallback: tampilkan apa adanya
+      _dobCtrl.text = dob;
     }
   }
 

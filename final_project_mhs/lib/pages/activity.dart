@@ -78,7 +78,9 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
       'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
     ];
     try {
-      final parts = apiDate.split('-');
+      // apiDate bisa "YYYY-MM-DD" atau "YYYY-MM-DDTHH:mm:ss...Z"
+      final datePart = apiDate.split('T').first;
+      final parts = datePart.split('-');
       if (parts.length == 3) {
         final day   = int.parse(parts[2]);
         final month = int.parse(parts[1]);
@@ -86,6 +88,7 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
         return '$day ${months[month]} $year';
       }
     } catch (_) {}
+
     return apiDate;
   }
 
@@ -300,12 +303,24 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
     bool showActions = false,
     bool showReview  = false,
   }) {
-    final venue        = booking['venue'] as Map<String, dynamic>? ?? {};
-    final venueName    = venue['title']     as String? ?? '-';
-    final category     = venue['category']  as String? ?? '-';
-    final imageUrl     = venue['image_url'] as String? ?? '';
-    final location     = venue['location']  as String? ?? '-';
-    final venuePrice   = venue['price']     as String? ?? '';
+    final venue = booking['venue'] as Map<String, dynamic>? ?? {};
+
+
+    final venueName = (venue['title'] as String?) ??
+        (booking['venue_title'] as String?) ??
+        '-';
+    final category  = (venue['category'] as String?) ??
+        (booking['category'] as String?) ??
+        '-';
+    final imageUrl  = (venue['image_url'] as String?) ??
+        (booking['image_url'] as String?) ??
+        '';
+    final location  = (venue['location'] as String?) ??
+        (booking['location'] as String?) ??
+        '-';
+    final venuePrice = (venue['price'] as String?) ??
+        (booking['price'] as String?) ??
+        '';
     final eventDateRaw = booking['event_date'] as String? ?? '-';
     final eventDate    = _formatDate(eventDateRaw);
     final eventName    = booking['event_name'] as String? ?? '';
@@ -409,7 +424,7 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
                   ),
                   const SizedBox(height: 8),
 
-                  // ── Status chip + actions row ─────────────────────
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -486,7 +501,7 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
                                 ),
                               ),
 
-                      // ── Chat + Cancel (ongoing) ───────────────────
+
                       if (showActions)
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -539,7 +554,7 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
                     ],
                   ),
 
-                  // ── Lanjutkan Pembayaran (ongoing only) ───────────
+
                   if (showActions) ...[
                     const SizedBox(height: 8),
                     SizedBox(
@@ -587,7 +602,7 @@ class _ActivityPageState extends RefreshablePageState<ActivityPage>
   }
 }
 
-// ── Review Bottom Sheet ────────────────────────────────────────────────────────
+
 
 class _ReviewSheet extends StatefulWidget {
   final int bookingId;

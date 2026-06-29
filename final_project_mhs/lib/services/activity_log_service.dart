@@ -36,7 +36,11 @@ class ActivityLogService {
         'image_url': imageUrl ?? '',
         'time': DateTime.now().toIso8601String(),
       });
-      final trimmed = list.length > 100 ? list.sublist(list.length - 100) : list;
+
+      final trimmed = list.length > 100
+          ? list.sublist(list.length - 100)
+          : list;
+
       await prefs.setString(_key, jsonEncode(trimmed));
     } catch (_) {}
   }
