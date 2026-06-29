@@ -76,7 +76,7 @@ const venues = [
     title:        'Frame Studio',
     category:     'Photoshoot',
     description:  'Studio foto profesional dengan berbagai set dan latar belakang untuk sesi foto.',
-    image_url:    'https://images.unsplash.com/photo-1554941068-a252680d7172?q=80&w=1200&auto=format&fit=crop',
+    image_url:    'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=1200&auto=format&fit=crop',
     address:      'Jl. Senopati No.10, Jakarta Selatan',
     rating:       4.5,
     review_count: 30,
