@@ -134,7 +134,7 @@ copy .env.example .env
 cp .env.example .env
 ```
 
-Buka file `.env` dan sesuaikan:
+Buka file `.env` pada folder planit-backend dan sesuaikan:
 
 ```env
 PORT=8000
@@ -168,7 +168,7 @@ npm run dev
 Buka terminal baru (biarkan terminal backend tetap berjalan):
 
 ```bash
-cd final_project_mhs
+cd Final_Project_MHS_Group11\final_project_mhs
 
 flutter pub get
 ```
