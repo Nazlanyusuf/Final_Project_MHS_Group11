@@ -93,6 +93,7 @@ Pastikan sudah terinstall di komputer Anda:
 | Android Studio / Emulator | API ≥ 21 | https://developer.android.com/studio |
 | Node.js + npm | ≥ 18.x | https://nodejs.org |
 | MySQL | - | https://dev.mysql.com/downloads atau via XAMPP/Laragon |
+| git | 2.54.0 | https://git-scm.com/install/windows |
 
 ---
 
@@ -100,6 +101,7 @@ Pastikan sudah terinstall di komputer Anda:
 
 ### Langkah 1 — Clone Repository
 
+pada terminal di VSCode
 ```bash
 git clone <url-repository-ini>
 cd <nama-folder-hasil-clone>
@@ -119,6 +121,7 @@ CREATE DATABASE planit_db;
 
 ### Langkah 3 — Setup Backend
 
+pada terminal di VSCode
 ```bash
 cd planit-backend
 
