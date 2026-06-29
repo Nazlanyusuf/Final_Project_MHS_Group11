@@ -103,8 +103,8 @@ Pastikan sudah terinstall di komputer Anda:
 
 pada terminal di VSCode
 ```bash
-git clone <url-repository-ini>
-cd <nama-folder-hasil-clone>
+git clone <https://github.com/Nazlanyusuf/Final_Project_MHS_Group11.git>
+cd <Final_Project_MHS_Group11>
 ```
 
 ---
